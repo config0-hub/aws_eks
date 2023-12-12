@@ -1,0 +1,20 @@
+desc: Creates a EKS cluster in a given VPC
+release: 0.0.1
+categories: 
+   - aws
+   - eks
+   - k8
+   - kubernetes
+   - cloud
+   - public_cloud
+tags:
+   - eks
+   - cluster
+   - k8
+   - kubernetes
+   - config0_saas
+   - config0
+   - aws
+   - infrastructure
+   - featured
+   - featured_infrastructure

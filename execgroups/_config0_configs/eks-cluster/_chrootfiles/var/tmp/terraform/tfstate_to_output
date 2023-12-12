@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+
+import os
+import json
+from config0_publisher.resource_manage import to_jsonfile
+from config0_publisher.serialization import b64_encode
+#from config0_publisher.utilities import print_json
+
+terraform_state_file = os.environ.get("TERRAFORM_STATE_FILE","terraform.tfstate")
+
+with open(terraform_state_file) as json_file:
+    data = json.load(json_file)
+
+with open(terraform_state_file) as json_file:
+    raw = json.load(json_file)
+
+# changed 45234532 - moved over to b64 hash
+results = { "raw": {"terraform":b64_encode(raw)} }
+
+for resource in data["resources"]:
+    for instance in resource["instances"]:
+        _type = resource["type"]
+        # this is the main category for the terraform template
+        if _type != "aws_eks_cluster": continue
+        results = resource["instances"][0]["attributes"]
+
+        _name = os.environ.get("EKS_CLUSTER")
+        if not _name: _name = os.environ.get("EKS_NAME")
+        if not _name: _name = os.environ.get("K8_NAME")
+        if _name: results["name"] = _name
+
+        results["_id"] = results["arn"].replace(":","_").replace("/","_")
+        results["id"] = results["_id"]
+
+        try:
+            region = results.get("arn").split(":")[3]
+        except:
+            region = None
+
+        if not region: os.environ.get("AWS_DEFAULT_REGION")
+        if region: results["region"] = region
+
+        break
+
+results["provider"] = "aws"
+results["resource_type"] = "eks"
+
+# ref 34532045732
+to_jsonfile(results,"eks.json")
