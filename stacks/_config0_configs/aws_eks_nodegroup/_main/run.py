@@ -96,13 +96,13 @@ def run(stackargs):
                              types="str")
 
     # publish_resource -> output_resource_to_ui
-    stack.add_substack('config0-hub:::output_resource_to_ui')
+    stack.add_substack('config0-publish:::output_resource_to_ui')
 
     # Add execgroup
-    stack.add_execgroup("config0-hub:::aws_eks::eks-nodegroup", "tf_execgroup")
+    stack.add_execgroup("config0-publish:::aws_eks::eks-nodegroup", "tf_execgroup")
 
     # Add substack
-    stack.add_substack('config0-hub:::tf_executor')
+    stack.add_substack('config0-publish:::tf_executor')
 
     # Initialize
     stack.init_variables()

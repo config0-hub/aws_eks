@@ -31,7 +31,7 @@
 ```
 infrastructure:
    eks:
-       stack_name: config0-hub:::aws_eks_dev
+       stack_name: config0-publish:::aws_eks_dev
        arguments:
           eks_cluster: eval-config0-eks
           role_name: eval-config0-role
@@ -82,7 +82,7 @@ selectors:
        resource_type: subnet
 infrastructure:
    eks:
-       stack_name: config0-hub:::aws_eks_dev
+       stack_name: config0-publish:::aws_eks_dev
        arguments:
           vpc_name: selector:::vpc_info::name
           vpc_id: selector:::vpc_info::vpc_id
