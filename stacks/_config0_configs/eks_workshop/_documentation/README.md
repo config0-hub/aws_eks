@@ -1,11 +1,11 @@
 **Description**
-  - The stack scaffolds the setup for the AWS EKS workshop
-  - Instead of a cloud9 instance, this stack will create an EC2 instance to ssh into for the workshop
+
+  - This stack sets up the initial structure for the AWS EKS workshop.
+  - Instead of using a Cloud9 instance, this stack creates an EC2 instance that can be accessed via SSH for the workshop.
 
 **Infrastructure**
 
-  - expects an existing VPC created in a config0.yml launch yaml. 
-  - the stack will query the Config0 resources table to get the VPC parameters
+  - This stack relies on the existence of a pre-existing VPC within the Config0 resources database.
 
 **Required**
 
@@ -28,6 +28,3 @@
 | eks_node_desired_capacity   | the desired capacity of the eks cluster               | string   | 1         |
 | eks_instance_type   | the instance_type for the ec2 instance used to get through the workshop| string   | t3.micro         |
 | disksize   | the disksize for the ec2 instance used to get through the workshop| string   | 25         |
-
-**Sample entry**
-```

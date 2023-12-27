@@ -170,10 +170,10 @@ class Main(newSchedStack):
                                 default="null")
 
         # Add substack
-        self.stack.add_substack('config0-publish:::ec2_ssh_upload')
-        self.stack.add_substack('config0-publish:::aws_iam_role')
-        self.stack.add_substack('config0-publish:::aws_eks')
-        self.stack.add_substack('config0-publish:::ec2_ubuntu_admin')
+        self.stack.add_substack('config0-hub:::ec2_ssh_upload')
+        self.stack.add_substack('config0-hub:::aws_iam_role')
+        self.stack.add_substack('config0-hub:::aws_eks')
+        self.stack.add_substack('config0-hub:::ec2_ubuntu_admin')
 
         self.stack.init_substacks()
 
@@ -181,18 +181,18 @@ class Main(newSchedStack):
 
         self.stack.init_variables()
         # ssh public key to insert into ec2 admin
-        self.stack.set_variable(
-            "ssh_key_name", "{}-public-key".format(self.stack.workshop_name))
+        self.stack.set_variable("ssh_key_name",
+                                "{}-public-key".format(self.stack.workshop_name))
 
         overide_values = {"key_name": self.stack.ssh_key_name}
         default_values = {"aws_default_region": self.stack.aws_default_region}
 
-        inputargs = {"default_values": default_values,
-                     "overide_values": overide_values}
+        human_description = "Upload user ssh public {}".format(self.stack.ssh_key_name)
 
-        inputargs["automation_phase"] = "infrastructure"
-        inputargs["human_description"] = 'Upload user ssh public {}'.format(
-            self.stack.ssh_key_name)
+        inputargs = {"default_values": default_values,
+                     "overide_values": overide_values,
+                     "automation_phase": "infrastructure",
+                     "human_description": human_description}
 
         return self.stack.ec2_ssh_upload.insert(display=True, **inputargs)
 
@@ -216,12 +216,12 @@ class Main(newSchedStack):
 
         default_values = {"aws_default_region": self.stack.aws_default_region}
 
-        inputargs = {"default_values": default_values,
-                     "overide_values": overide_values}
+        human_description = "Create IAM role for {}".format(self.stack.workshop_name)
 
-        inputargs["automation_phase"] = "infrastructure"
-        inputargs["human_description"] = 'Create IAM role for {}'.format(
-            self.stack.workshop_name)
+        inputargs = {"default_values": default_values,
+                     "overide_values": overide_values,
+                     "automation_phase": "infrastructure",
+                     "human_description": human_description}
 
         return self.stack.aws_iam_role.insert(display=True, **inputargs)
 
@@ -257,12 +257,12 @@ class Main(newSchedStack):
                           "aws_default_region": self.stack.aws_default_region
                           }
 
-        inputargs = {"default_values": default_values,
-                     "overide_values": overide_values}
+        human_description = "Create EKS cluster {}".format(self.stack.eks_cluster)
 
-        inputargs["automation_phase"] = "infrastructure"
-        inputargs["human_description"] = 'Create EKS cluster {}'.format(
-            self.stack.eks_cluster)
+        inputargs = {"default_values": default_values,
+                     "overide_values": overide_values,
+                     "automation_phase" : "infrastructure",
+                     "human_description" : human_description}
 
         return self.stack.aws_eks.insert(display=True, **inputargs)
 
@@ -305,12 +305,12 @@ class Main(newSchedStack):
                           "sg_id": self.stack.bastion_sg_id,
                           }
 
-        inputargs = {"default_values": default_values,
-                     "overide_values": overide_values}
+        human_description = "Create EC2 admin {}".format(self.stack.hostname)
 
-        inputargs["automation_phase"] = "infrastructure"
-        inputargs["human_description"] = 'Create EC2 admin {}'.format(
-            self.stack.hostname)
+        inputargs = {"default_values": default_values,
+                     "overide_values": overide_values,
+                     "automation_phase" : "infrastructure",
+                     "human_description" : human_description}
 
         return self.stack.ec2_ubuntu_admin.insert(display=True, **inputargs)
 

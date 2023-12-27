@@ -32,16 +32,16 @@ class Main(newSchedStack):
                                 types="str,null")
 
         # add execgroup
-        self.stack.add_execgroup(
-            "config0-publish:::aws_eks::eks-cluster", "cloud_resource")
+        self.stack.add_execgroup("config0-hub:::aws_eks::eks-cluster",
+                                 "cloud_resource")
 
         # add shelloutconfig dependencies
-        self.stack.add_shelloutconfig(
-            'config0-publish:::aws::map-role-aws-to-eks', "map_role")
+        self.stack.add_shelloutconfig("config0-hub:::aws::map-role-aws-to-eks",
+                                      "map_role")
 
         # add substacks
-        self.stack.add_substack('config0-publish:::aws_eks_cluster')
-        self.stack.add_substack('config0-publish:::aws_eks_nodegroup')
+        self.stack.add_substack("config0-hub:::aws_eks_cluster")
+        self.stack.add_substack("config0-hub:::aws_eks_nodegroup")
 
         # initialize
         self.stack.init_execgroups()
@@ -85,9 +85,11 @@ class Main(newSchedStack):
         default_values = self.stack.get_tagged_vars(tag="cluster",
                                                     output="dict")
 
+        human_description = "Create EKS cluster {}".format(self.stack.eks_cluster)
+
         inputargs = {"default_values": default_values,
                      "automation_phase": "infrastructure",
-                     "human_description": 'Create EKS cluster {}'.format(self.stack.eks_cluster)}
+                     "human_description": human_description}
 
         return self.stack.aws_eks_cluster.insert(display=True, **inputargs)
 
@@ -154,7 +156,8 @@ class Main(newSchedStack):
         self.stack.init_variables()
 
         if not self.stack.get_attr("eks_subnet_ids"):
-            self.stack.set_variable("eks_subnet_ids", self.stack.subnet_ids)
+            self.stack.set_variable("eks_subnet_ids",
+                                    self.stack.subnet_ids)
 
         if not self.stack.get_attr("eks_subnet_ids"):
             raise Exception("needs to provide subnet_ids or eks_subnet_ids")
@@ -164,9 +167,11 @@ class Main(newSchedStack):
         default_values = self.stack.get_tagged_vars(tag="nodegroups",
                                                     output="dict")
 
+        human_description = "Create EKS nodegroup {}".format(self.stack.eks_cluster)
+
         inputargs = {"default_values": default_values,
                      "automation_phase": "infrastructure",
-                     "human_description": 'Create EKS nodegroup {}'.format(self.stack.eks_cluster)}
+                     "human_description": human_description}
 
         return self.stack.aws_eks_nodegroup.insert(display=True, **inputargs)
 
