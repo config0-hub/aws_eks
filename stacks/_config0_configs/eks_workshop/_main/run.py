@@ -170,10 +170,10 @@ class Main(newSchedStack):
                                 default="null")
 
         # Add substack
-        self.stack.add_substack('config0-hub:::ec2_ssh_upload')
-        self.stack.add_substack('config0-hub:::aws_iam_role')
-        self.stack.add_substack('config0-hub:::aws_eks')
-        self.stack.add_substack('config0-hub:::ec2_ubuntu_admin')
+        self.stack.add_substack('config0-publish:::ec2_ssh_upload')
+        self.stack.add_substack('config0-publish:::aws_iam_role')
+        self.stack.add_substack('config0-publish:::aws_eks')
+        self.stack.add_substack('config0-publish:::ec2_ubuntu_admin')
 
         self.stack.init_substacks()
 

@@ -94,21 +94,21 @@ def run(stackargs):
                             default=900)
 
     # Add execgroup
-    stack.add_execgroup("config0-hub:::aws_eks::eks-cluster",
+    stack.add_execgroup("config0-publish:::aws_eks::eks-cluster",
                         "tf_execgroup")
 
     # Add substack
-    stack.add_substack("config0-hub:::tf_executor")
+    stack.add_substack("config0-publish:::tf_executor")
 
     # Add shelloutconfig dependencies
-    stack.add_shelloutconfig("config0-hub:::aws::map-role-aws-to-eks",
+    stack.add_shelloutconfig("config0-publish:::aws::map-role-aws-to-eks",
                              "map_role")
 
-    stack.add_shelloutconfig("config0-hub:::aws::shellout-with-codebuild",
+    stack.add_shelloutconfig("config0-publish:::aws::shellout-with-codebuild",
                              "shellout_codebuild")
 
     # add substacks
-    stack.add_substack("config0-hub:::publish_eks_info")
+    stack.add_substack("config0-publish:::publish_eks_info")
 
     # Initialize
     stack.init_variables()
