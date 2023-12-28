@@ -87,7 +87,7 @@ def run(stackargs):
                              types="int")
 
     stack.parse.add_optional(key="timeout",
-                             default=1800,
+                             default=2500,
                              types="int")
 
     stack.parse.add_optional(key="aws_default_region",

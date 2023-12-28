@@ -91,7 +91,7 @@ def run(stackargs):
 
     stack.parse.add_optional(key="build_timeout",
                             types="int",
-                            default=900)
+                            default=2800)
 
     # Add execgroup
     stack.add_execgroup("config0-publish:::aws_eks::eks-cluster",
