@@ -146,6 +146,7 @@ def run(stackargs):
                        terraform_type="aws_eks_cluster")
 
     tf.include(maps={"id": "arn",
+                     "aws_default_region":"region",
                      "cluster_name": "name",
                      "cluster_node_role_arn": "node_role_arn",
                      "cluster_role_arn": "role_arn",
