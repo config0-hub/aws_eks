@@ -77,10 +77,6 @@ def run(stackargs):
                              default=True,
                              types="bool")
 
-    stack.parse.add_optional(key="codebuild_basename",
-                            types="str",
-                            default="config0-iac")
-
     stack.parse.add_optional(key="compute_type",
                             types="str",
                             default="BUILD_GENERAL1_SMALL")
@@ -192,8 +188,7 @@ def run(stackargs):
 
     if stack.get_attr("role_name") and stack.use_codebuild:
 
-        buildparams = { "codebuild_basename":stack.codebuild_basename,
-                        "build_timeout":stack.build_timeout,
+        buildparams = { "build_timeout":stack.build_timeout,
                         "compute_type": stack.compute_type,
                         "image_type": stack.image_type,
                         "build_image": stack.build_image,
