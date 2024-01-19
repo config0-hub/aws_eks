@@ -92,7 +92,7 @@ def run(stackargs):
 
     stack.parse.add_optional(key="aws_default_region",
                              default="eu-west-1",
-                             tags="tfvar,resource,db,runtime_settings",
+                             tags="tfvar,resource,db,tf_runtime",
                              types="str")
 
     # publish_resource -> output_resource_to_ui
@@ -116,16 +116,16 @@ def run(stackargs):
                        tags="tfvar",
                        types="list")
 
-    # add some aliases for eks_cluster in both runtime_settings
+    # add some aliases for eks_cluster in both tf_runtime
     # run execution and db values
     stack.set_variable("k8_name",
                        stack.eks_cluster,
-                       tags="db,runtime_settings",
+                       tags="db,tf_runtime",
                        types="str")
 
     stack.set_variable("eks_name",
                        stack.eks_cluster,
-                       tags="db,runtime_settings",
+                       tags="db,tf_runtime",
                        types="str")
 
     _set_eks_node_group_name(stack)

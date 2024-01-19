@@ -54,7 +54,7 @@ def run(stackargs):
                              types="str")
 
     stack.parse.add_required(key="eks_cluster",
-                             tags="tfvar,role,db,runtime_settings",
+                             tags="tfvar,role,db,tf_runtime",
                              types="str")
 
     stack.parse.add_optional(key="eks_cluster_version",
@@ -69,7 +69,7 @@ def run(stackargs):
 
     stack.parse.add_optional(key="aws_default_region",
                              default="eu-west-1",
-                             tags="tfvar,role,db,resource,runtime_settings",
+                             tags="tfvar,role,db,resource,tf_runtime",
                              types="str")
 
     # codebuild specifications
@@ -117,16 +117,16 @@ def run(stackargs):
                        tags="tfvar",
                        types="list")
 
-    # add some aliases for eks_cluster in both runtime_settings
+    # add some aliases for eks_cluster in both tf_runtime
     # run execution and db values
     stack.set_variable("k8_name",
                        stack.eks_cluster,
-                       tags="db,runtime_settings",
+                       tags="db,tf_runtime",
                        types="str")
 
     stack.set_variable("eks_name",
                        stack.eks_cluster,
-                       tags="db,runtime_settings",
+                       tags="db,tf_runtime",
                        types="str")
 
     stack.set_variable("build_image",
