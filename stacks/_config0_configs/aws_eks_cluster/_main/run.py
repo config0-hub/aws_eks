@@ -186,15 +186,26 @@ def run(stackargs):
 
     if stack.get_attr("role_name") and stack.use_codebuild:
 
-        buildparams = { "build_timeout":stack.build_timeout,
-                        "compute_type": stack.compute_type,
-                        "image_type": stack.image_type,
-                        "build_image": stack.build_image,
-                        "buildspec":_get_buildspec(stack),
-                        "build_env_vars": { "EKS_CLUSTER":stack.eks_cluster,
-                                            "EKS_ROLENAME":stack.role_name } }
+        inputargs = {
+            "build_timeout":stack.build_timeout,
+            "compute_type": stack.compute_type,
+            "image_type": stack.image_type,
+            "build_image": stack.build_image,
+            "buildspec":_get_buildspec(stack),
+        }
 
-        env_vars = { "CONFIG0_BUILDPARMS_HASH": stack.b64_encode({ "buildparams":buildparams }) }
+        build_env_vars = {
+            "EKS_CLUSTER": stack.eks_cluster,
+            "EKS_ROLENAME": stack.role_name
+        }
+
+        env_vars = { "CONFIG0_BUILDPARMS_HASH": stack.b64_encode({
+            "buildparams": {
+                "inputargs":inputargs,
+                "env_vars":build_env_vars
+            }
+        })
+        }
 
         inputargs = {"display": True,
                      "human_description": "Mapping AWS IAM to EKS role with Codebuild",
