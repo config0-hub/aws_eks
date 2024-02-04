@@ -85,10 +85,6 @@ def run(stackargs):
                             types="str",
                             default="LINUX_CONTAINER")
 
-    stack.parse.add_optional(key="build_timeout",
-                            types="int",
-                            default=2800)
-
     # Add execgroup
     stack.add_execgroup("config0-publish:::aws_eks::eks-cluster",
                         "tf_execgroup")
@@ -131,6 +127,8 @@ def run(stackargs):
 
     stack.set_variable("build_image",
                        "aws/codebuild/standard:7.0")
+
+    stack.set_variable("timeout",2700)
 
     # use the terraform constructor (helper)
     # but this is optional

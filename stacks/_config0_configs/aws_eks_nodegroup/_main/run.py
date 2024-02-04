@@ -86,10 +86,6 @@ def run(stackargs):
                              tags="tfvar",
                              types="int")
 
-    stack.parse.add_optional(key="timeout",
-                             default=2500,
-                             types="int")
-
     stack.parse.add_optional(key="aws_default_region",
                              default="eu-west-1",
                              tags="tfvar,resource,db,tf_runtime",
@@ -127,6 +123,8 @@ def run(stackargs):
                        stack.eks_cluster,
                        tags="db,tf_runtime",
                        types="str")
+
+    stack.set_variable("timeout",2700)
 
     _set_eks_node_group_name(stack)
     _set_eks_node_role_arn(stack)
