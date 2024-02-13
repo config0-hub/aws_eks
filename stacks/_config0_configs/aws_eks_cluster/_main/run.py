@@ -140,7 +140,6 @@ def run(stackargs):
                        terraform_type="aws_eks_cluster")
 
     tf.include(maps={"id": "arn",
-                     "aws_default_region":"region",
                      "cluster_name": "name",
                      "cluster_node_role_arn": "node_role_arn",
                      "cluster_role_arn": "role_arn",
@@ -214,6 +213,12 @@ def run(stackargs):
         stack.shellout_codebuild.run(**inputargs)
 
     elif stack.get_attr("role_name"):
+
+        # we need the AWS credentials to map role
+        # though we can in the future make the modes in codebuild
+        # lambda, but we will need to install eksctl in the worker
+        # for simplicity, we just do in the config0 worker since
+        # it's a simple operation
         _env_vars = stack.get_tagged_vars(tag="role",
                                          output="dict",
                                          uppercase=True)
