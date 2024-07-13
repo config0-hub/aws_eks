@@ -36,7 +36,7 @@ def run(stackargs):
                              tags="tfvar,db",
                              types="str")
 
-    stack.parse.add_required(key="eks_subnet_ids")
+    stack.parse.add_required(key="eks_node_group_subnet_ids")
 
     stack.parse.add_required(key="eks_node_capacity_type",
                              default="ON_DEMAND",
@@ -107,8 +107,8 @@ def run(stackargs):
     stack.init_shelloutconfigs()
     stack.init_substacks()
 
-    stack.set_variable("eks_subnet_ids",
-                       stack.to_list(stack.eks_subnet_ids),
+    stack.set_variable("eks_node_group_subnet_ids",
+                       stack.to_list(stack.eks_node_group_subnet_ids),
                        tags="tfvar",
                        types="list")
 

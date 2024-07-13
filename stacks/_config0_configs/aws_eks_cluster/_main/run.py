@@ -46,10 +46,10 @@ def run(stackargs):
                              tags="tfvar,db",
                              types="str")
 
-    stack.parse.add_required(key="subnet_ids")
+    stack.parse.add_required(key="eks_cluster_subnet_ids")
 
     # this is required in addition to other sg_ids that will be created
-    stack.parse.add_required(key="sg_id",
+    stack.parse.add_required(key="eks_cluster_sg_id",
                              tags="tfvar",
                              types="str")
 
@@ -108,8 +108,8 @@ def run(stackargs):
     stack.init_substacks()
     stack.init_shelloutconfigs()
 
-    stack.set_variable("subnet_ids",
-                       stack.to_list(stack.subnet_ids),
+    stack.set_variable("eks_cluster_subnet_ids",
+                       stack.to_list(stack.eks_cluster_subnet_ids),
                        tags="tfvar",
                        types="list")
 

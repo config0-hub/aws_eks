@@ -3,7 +3,7 @@ variable "aws_default_region" {
 }
 
 variable "eks_cluster" {}
-variable "eks_subnet_ids" {}
+variable "eks_node_group_subnet_ids" {}
 variable "eks_node_group_name" {}
 variable "eks_node_role_arn" {}
 

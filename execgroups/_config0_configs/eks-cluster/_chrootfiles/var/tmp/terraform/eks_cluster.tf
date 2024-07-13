@@ -5,8 +5,8 @@ resource "aws_eks_cluster" "this" {
   version  = var.eks_cluster_version
 
   vpc_config {
-    security_group_ids        = [ aws_security_group.eks_cluster.id, aws_security_group.eks_nodes.id, var.sg_id ]
-    subnet_ids                = var.subnet_ids
+    security_group_ids        = [ aws_security_group.eks_cluster.id, aws_security_group.eks_nodes.id, var.eks_cluster_sg_id ]
+    subnet_ids                = var.eks_cluster_subnet_ids
     endpoint_private_access   = var.cluster_endpoint_private_access
     endpoint_public_access    = var.cluster_endpoint_public_access
     public_access_cidrs       = var.public_access_cidrs 

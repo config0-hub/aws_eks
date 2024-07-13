@@ -18,8 +18,8 @@ class Main(newSchedStack):
                                 tags="cluster,nodegroups",
                                 default="us-west-1")
 
-        self.parse.add_optional(key="subnet_ids",
-                                tags="cluster,nodegroups")
+        self.parse.add_optional(key="eks_cluster_subnet_ids",
+                                tags="cluster")
 
         self.parse.add_optional(key="cloud_tags_hash",
                                 tags="cluster,nodegroups",
@@ -58,7 +58,7 @@ class Main(newSchedStack):
                                 tags="cluster",
                                 types="str")
 
-        self.parse.add_required(key="sg_id",
+        self.parse.add_required(key="eks_cluster_sg_id",
                                 tags="cluster",
                                 types="str")
 
@@ -149,18 +149,18 @@ class Main(newSchedStack):
                                 tags="nodegroups",
                                 default=1800)
 
-        self.parse.add_optional(key="eks_subnet_ids",
+        self.parse.add_optional(key="eks_node_group_subnet_ids",
                                 tags="nodegroups",
                                 default="null")
 
         self.stack.init_variables()
 
-        if not self.stack.get_attr("eks_subnet_ids"):
-            self.stack.set_variable("eks_subnet_ids",
-                                    self.stack.subnet_ids)
+        if not self.stack.get_attr("eks_node_group_subnet_ids"):
+            self.stack.set_variable("eks_node_group_subnet_ids",
+                                    self.stack.eks_cluster_subnet_ids)
 
-        if not self.stack.get_attr("eks_subnet_ids"):
-            raise Exception("needs to provide subnet_ids or eks_subnet_ids")
+        if not self.stack.get_attr("eks_node_group_subnet_ids"):
+            raise Exception("needs to provide eks_cluster_subnet_ids or eks_node_group_subnet_ids")
 
         self.stack.verify_variables()
 

@@ -238,7 +238,7 @@ class Main(newSchedStack):
         overide_values = {"role_name": self.stack.role_name,
                           "eks_cluster": self.stack.eks_cluster,
                           "eks_cluster_version": self.stack.eks_cluster_version,
-                          "eks_subnet_ids": self.stack.subnet_ids,
+                          "eks_node_group_subnet_ids": self.stack.subnet_ids,
                           "publish_to_saas": True}
 
         if self.stack.get_attr("eks_node_role_arn"):

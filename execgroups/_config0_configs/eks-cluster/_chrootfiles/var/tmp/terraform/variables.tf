@@ -7,9 +7,9 @@ variable "eks_cluster_version" {
 }
 
 variable "vpc_id" {}
-variable "subnet_ids" {}
+variable "eks_cluster_subnet_ids" {}
 variable "eks_cluster" {}
-variable "sg_id" {}
+variable "eks_cluster_sg_id" {}
 
 variable "cluster_endpoint_private_access" {
   default = true
