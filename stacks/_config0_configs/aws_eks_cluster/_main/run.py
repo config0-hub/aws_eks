@@ -37,11 +37,6 @@ def run(stackargs):
     # instantiate authoring stack
     stack = newStack(stackargs)
 
-    # Add variables
-    stack.parse.add_required(key="vpc_name",
-                             tags="tfvar,db",
-                             types="str")
-
     stack.parse.add_required(key="vpc_id",
                              tags="tfvar,db",
                              types="str")

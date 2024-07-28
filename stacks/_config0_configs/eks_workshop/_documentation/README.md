@@ -11,7 +11,6 @@
 
 | argument      | description                            | var type | default      |
 | ------------- | -------------------------------------- | -------- | ------------ |
-| vpc_name   | name of the vpc                 | string   | None         |
 | vpc_id   | id of the vpc                 | string   | None         |
 | subnet_ids   | the subnet_ids separated by comma - csv | string   | None         |
 | sg_id   | the security group for EKS instance | string   | None         |

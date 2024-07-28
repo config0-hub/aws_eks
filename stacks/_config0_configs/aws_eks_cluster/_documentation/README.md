@@ -10,7 +10,6 @@
 
 | argument      | description                            | var type | default      |
 | ------------- | -------------------------------------- | -------- | ------------ |
-| vpc_name   | name of the vpc                 | string   | None         |
 | vpc_id   | id of the vpc                 | string   | None         |
 | eks_cluster   | the name given to the eks cluster | string   | None         |
 | role_name   | the aws role_name to access the eks cluster | string   | None         |
