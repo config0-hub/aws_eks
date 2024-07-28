@@ -50,10 +50,6 @@ class Main(newSchedStack):
 
     def run_eks_cluster(self):
 
-        self.parse.add_required(key="vpc_name",
-                                tags="cluster",
-                                types="str")
-
         self.parse.add_required(key="vpc_id",
                                 tags="cluster",
                                 types="str")
