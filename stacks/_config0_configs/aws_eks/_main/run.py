@@ -83,9 +83,11 @@ class Main(newSchedStack):
 
         human_description = "Create EKS cluster {}".format(self.stack.eks_cluster)
 
-        inputargs = {"default_values": default_values,
-                     "automation_phase": "infrastructure",
-                     "human_description": human_description}
+        inputargs = {
+            "default_values": default_values,
+            "automation_phase": "infrastructure",
+            "human_description": human_description
+        }
 
         return self.stack.aws_eks_cluster.insert(display=True, **inputargs)
 
@@ -173,7 +175,7 @@ class Main(newSchedStack):
 
     def run(self):
 
-        self.stack.unset_parallel()
+        self.stack.unset_parallel(sched_init=True)
         self.add_job("eks_cluster")
         self.add_job("eks_nodegroup")
 
