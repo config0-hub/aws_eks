@@ -67,11 +67,6 @@ def run(stackargs):
                              tags="tfvar,role,db,resource,tf_exec_env",
                              types="str")
 
-    # codebuild specifications
-    stack.parse.add_optional(key="use_codebuild",
-                             default=True,
-                             types="bool")
-
     stack.parse.add_optional(key="compute_type",
                             types="str",
                             default="BUILD_GENERAL1_SMALL")
@@ -165,20 +160,7 @@ def run(stackargs):
     stack.tf_executor.insert(display=True,
                              **tf.get())
 
-    # fixfix777
-    #if stack.get_attr("publish_to_saas"):
-    #    default_values = {"eks_cluster": stack.eks_cluster}
-    #    inputargs = {"default_values": default_values}
-    #    inputargs["automation_phase"] = "infrastructure"
-    #    inputargs["human_description"] = 'Publish EKS info {}'.format(
-    #        stack.eks_cluster)
-    #    stack.publish_eks_info.insert(display=True, **inputargs)
-
-    # associating/map an AWS role to EKS role
-    # the AWS role will be able to run kubectl
-    # the AWS* credentials should be root or referenced iam
-
-    if stack.get_attr("role_name") and stack.use_codebuild:
+    if stack.get_attr("role_name"):
 
         inputargs = {
             "build_timeout":stack.build_timeout,
@@ -193,7 +175,7 @@ def run(stackargs):
             "EKS_ROLENAME": stack.role_name
         }
 
-        env_vars = { "CONFIG0_BUILDPARMS_HASH": stack.b64_encode({
+        env_vars = { "CODEBUILD_PARAMS_HASH": stack.b64_encode({
             "buildparams": {
                 "inputargs":inputargs,
                 "env_vars":build_env_vars
@@ -207,26 +189,28 @@ def run(stackargs):
 
         stack.shellout_codebuild.run(**inputargs)
 
-    elif stack.get_attr("role_name"):
+    # this is deprecated and replaced with doing it via
+    # codebuild b/c of role based permissions
+    #if stack.get_attr("role_name"):
 
-        # we need the AWS credentials to map role
-        # though we can in the future make the modes in codebuild
-        # lambda, but we will need to install eksctl in the worker
-        # for simplicity, we just do in the config0 worker since
-        # it's a simple operation
-        _env_vars = stack.get_tagged_vars(tag="role",
-                                         output="dict",
-                                         uppercase=True)
+    #    # we need the AWS credentials to map role
+    #    # though we can in the future make the modes in codebuild
+    #    # lambda, but we will need to install eksctl in the worker
+    #    # for simplicity, we just do in the config0 worker since
+    #    # it's a simple operation
+    #    _env_vars = stack.get_tagged_vars(tag="role",
+    #                                     output="dict",
+    #                                     uppercase=True)
 
-        _env_vars["EKS_ROLENAME"] = stack.role_name
-        _env_vars["AWS_ACCESS_KEY_ID"] = os.environ["AWS_ACCESS_KEY_ID"]
-        _env_vars["AWS_SECRET_ACCESS_KEY"] = os.environ["AWS_SECRET_ACCESS_KEY"]
-        _env_vars["DOCKER_EXEC"] = "weaveworks/eksctl:0.82.0"
+    #    _env_vars["EKS_ROLENAME"] = stack.role_name
+    #    _env_vars["AWS_ACCESS_KEY_ID"] = os.environ["AWS_ACCESS_KEY_ID"]
+    #    _env_vars["AWS_SECRET_ACCESS_KEY"] = os.environ["AWS_SECRET_ACCESS_KEY"]
+    #    _env_vars["DOCKER_EXEC"] = "weaveworks/eksctl:0.82.0"
 
-        inputargs = {"display": True,
-                     "human_description": "Mapping AWS IAM to EKS role",
-                     "env_vars": json.dumps(_env_vars)}
+    #    inputargs = {"display": True,
+    #                 "human_description": "Mapping AWS IAM to EKS role",
+    #                 "env_vars": json.dumps(_env_vars)}
 
-        stack.map_role.run(**inputargs)
+    #    stack.map_role.run(**inputargs)
 
     return stack.get_results()
