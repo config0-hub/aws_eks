@@ -1,4 +1,4 @@
-import json
+Omport json
 from config0_publisher.terraform import TFConstructor
 
 def _get_buildspec(stack):
@@ -187,3 +187,5 @@ def run(stackargs):
                      "env_vars": json.dumps(env_vars)}
 
         stack.shellout_codebuild.run(**inputargs)
+
+return stack.get_results()
