@@ -188,4 +188,4 @@ def run(stackargs):
 
         stack.shellout_codebuild.run(**inputargs)
 
-return stack.get_results()
+    return stack.get_results()
