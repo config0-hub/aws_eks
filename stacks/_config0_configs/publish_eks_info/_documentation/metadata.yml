@@ -1,0 +1,16 @@
+desc:  The stack publishes the information for EKS.
+release: 0.0.1
+categories: 
+   - aws
+   - eks
+   - cloud
+   - public_cloud
+tags:
+   - eks
+   - kubernetes
+   - k8
+   - k8s
+   - aws
+   - infrastructure
+   - cloud
+   - public_cloud
