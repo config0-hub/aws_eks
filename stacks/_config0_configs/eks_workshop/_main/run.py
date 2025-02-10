@@ -32,13 +32,13 @@ echo 'export LBC_VERSION="v2.3.0"' >>  ~/.bash_profile
 .  ~/.bash_profile
 
 export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
-export AWS_REGION=$(curl -s 169.254.169.254/latest/dynamic/instance-identity/document | jq -r '.region')
-export AZS=($(aws ec2 describe-availability-zones --query 'AvailabilityZones[].ZoneName' --output text --region $AWS_REGION))
+export AWS_DEFAULT_REGION=$(curl -s 169.254.169.254/latest/dynamic/instance-identity/document | jq -r '.region')
+export AZS=($(aws ec2 describe-availability-zones --query 'AvailabilityZones[].ZoneName' --output text --region $AWS_DEFAULT_REGION))
 
 echo "export ACCOUNT_ID=${ACCOUNT_ID}" | tee -a ~/.bash_profile
-echo "export AWS_REGION=${AWS_REGION}" | tee -a ~/.bash_profile
+echo "export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}" | tee -a ~/.bash_profile
 echo "export AZS=(${AZS[@]})" | tee -a ~/.bash_profile
-aws configure set default.region ${AWS_REGION}
+aws configure set default.region ${AWS_DEFAULT_REGION}
 aws configure get default.region
 
 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
