@@ -1,44 +1,51 @@
-output "cluster_oidc_issuer" {
-  value = aws_eks_cluster.this.identity[0].oidc[0].issuer
-}
-
 output "cluster_security_group_id" {
-  value = aws_eks_cluster.this.vpc_config[0].cluster_security_group_id
-}
-
-output "security_group_ids" {
-  value = aws_eks_cluster.this.vpc_config[0].security_group_ids
-}
-
-output "subnet_ids" {
-  value = aws_eks_cluster.this.vpc_config[0].subnet_ids
+  value = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
 }
 
 output "node_role_arn" {
   value = aws_iam_role.node.arn
 }
 
-#output "certificate_authority" {
-#  value = aws_eks_cluster.this.certificate_authority[0].data
-#}
+output "arn" {
+  value = aws_eks_cluster.main.arn
+}
 
-#output "cluster_role_arn" {
-#  value = aws_eks_cluster.this.role_arn
-#}
+output "platform_version" {
+  value = aws_eks_cluster.main.platform_version
+}
 
-#output "cluster_name" {
-#  value = aws_eks_cluster.this.name
-#}
-#
-#output "cluster_endpoint" {
-#  value = aws_eks_cluster.this.endpoint
-#}
+output "version" {
+  value = aws_eks_cluster.main.version
+}
 
-#output "cluster_subnet_ids" {
-#  value = aws_eks_cluster.this.vpc_config[0].subnet_ids
-#}
+output "role_arn" {
+  value = aws_eks_cluster.main.role_arn
+}
 
-#output "cluster_security_group_ids" {
-#  value = aws_eks_cluster.this.vpc_config[0].security_group_ids
-#}
+output "vpc_config" {
+  value = aws_eks_cluster.main.vpc_config
+}
 
+output "eks_vpc_config" {
+  value = aws_eks_cluster.main.vpc_config
+}
+
+output "eks_kubernetes_network_config" {
+  value = aws_eks_cluster.main.kubernetes_network_config
+}
+
+output "cluster_name" {
+  value = aws_eks_cluster.main.name
+}
+
+output "endpoint" {
+  value = aws_eks_cluster.main.endpoint
+}
+
+output "cluster_subnet_ids" {
+  value = aws_eks_cluster.main.vpc_config[0].subnet_ids
+}
+
+output "cluster_security_group_ids" {
+  value = aws_eks_cluster.main.vpc_config[0].security_group_ids
+}

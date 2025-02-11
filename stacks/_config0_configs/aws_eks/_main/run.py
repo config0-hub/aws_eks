@@ -81,7 +81,7 @@ class Main(newSchedStack):
         default_values = self.stack.get_tagged_vars(tag="cluster",
                                                     output="dict")
 
-        human_description = "Create EKS cluster {}".format(self.stack.eks_cluster)
+        human_description = f"Create EKS cluster {self.stack.eks_cluster}"
 
         inputargs = {
             "default_values": default_values,
@@ -165,7 +165,7 @@ class Main(newSchedStack):
         default_values = self.stack.get_tagged_vars(tag="nodegroups",
                                                     output="dict")
 
-        human_description = "Create EKS nodegroup {}".format(self.stack.eks_cluster)
+        human_description = f"Create EKS nodegroup {self.stack.eks_cluster}"
 
         inputargs = {"default_values": default_values,
                      "automation_phase": "infrastructure",

@@ -135,8 +135,11 @@ def run(stackargs):
                        execgroup_name=stack.tf_execgroup.name,
                        provider="aws",
                        resource_name=stack.eks_node_group_name,
-                       resource_type="k8_node_group",
-                       terraform_type="aws_eks_node_group")
+                       resource_type="k8_node_group")
+
+    tf.include(values={
+        "aws_default_region":stack.aws_default_region
+    })
 
     tf.include(maps={"id": "arn"})
 

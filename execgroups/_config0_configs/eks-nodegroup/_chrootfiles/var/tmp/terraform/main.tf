@@ -24,3 +24,7 @@ resource "aws_eks_node_group" "main" {
     },
   )
 }
+
+output "arn" {
+  value = aws_eks_node_group.main.arn
+}

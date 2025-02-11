@@ -1,7 +1,7 @@
 import json
 from config0_publisher.terraform import TFConstructor
 
-def _get_buildspec(stack):
+def _get_buildspec():
 
     contents_1 = '''version: 0.2
 phases:
@@ -26,13 +26,9 @@ phases:
       - /tmp/eksctl create iamidentitymapping --cluster ${EKS_CLUSTER} --arn ${EKS_ROLEARN} --group system:masters --username admin
 '''
 
-    contents = contents_1 + contents_3
-
-    return contents
+    return contents_1 + contents_3
 
 def run(stackargs):
-
-    import os
 
     # instantiate authoring stack
     stack = newStack(stackargs)
@@ -83,9 +79,6 @@ def run(stackargs):
     stack.add_substack("config0-publish:::tf_executor")
 
     # Add shelloutconfig dependencies
-    stack.add_shelloutconfig("config0-publish:::aws::map-role-aws-to-eks",
-                             "map_role")
-
     stack.add_shelloutconfig("config0-publish:::aws::shellout-with-codebuild",
                              "shellout_codebuild")
 
@@ -126,28 +119,21 @@ def run(stackargs):
                        execgroup_name=stack.tf_execgroup.name,
                        provider="aws",
                        resource_name=stack.eks_cluster,
-                       resource_type="eks",
-                       terraform_type="aws_eks_cluster")
+                       resource_type="eks")
 
+    tf.include(values={
+        "aws_default_region":stack.aws_default_region,
+        "name":stack.eks_cluster
+    })
+
+    # this will need to be correspond to those
+    # in the output section
     tf.include(maps={"id": "arn",
-                     "cluster_name": "name",
                      "cluster_node_role_arn": "node_role_arn",
                      "cluster_role_arn": "role_arn",
                      "cluster_security_group_ids": "security_group_ids",
                      "cluster_subnet_ids": "subnet_ids",
                      "cluster_endpoint": "endpoint"})
-
-    tf.include(keys=["arn",
-                     "name",
-                     "platform_version",
-                     "version",
-                     "node_role_arn"
-                     "security_group_ids"
-                     "subnet_ids"
-                     "role_arn",
-                     "vpc_config",
-                     "kubernetes_network_config",
-                     "endpoint"])
 
     tf.output(keys=["endpoint",
                     "arn",
@@ -167,7 +153,7 @@ def run(stackargs):
             "compute_type": stack.compute_type,
             "image_type": stack.image_type,
             "build_image": stack.build_image,
-            "buildspec":_get_buildspec(stack),
+            "buildspec":_get_buildspec(),
         }
 
         build_env_vars = {
@@ -188,29 +174,5 @@ def run(stackargs):
                      "env_vars": json.dumps(env_vars)}
 
         stack.shellout_codebuild.run(**inputargs)
-
-    # this is deprecated and replaced with doing it via
-    # codebuild b/c of role based permissions
-    #if stack.get_attr("role_name"):
-
-    #    # we need the AWS credentials to map role
-    #    # though we can in the future make the modes in codebuild
-    #    # lambda, but we will need to install eksctl in the worker
-    #    # for simplicity, we just do in the config0 worker since
-    #    # it's a simple operation
-    #    _env_vars = stack.get_tagged_vars(tag="role",
-    #                                     output="dict",
-    #                                     uppercase=True)
-
-    #    _env_vars["EKS_ROLENAME"] = stack.role_name
-    #    _env_vars["AWS_ACCESS_KEY_ID"] = os.environ["AWS_ACCESS_KEY_ID"]
-    #    _env_vars["AWS_SECRET_ACCESS_KEY"] = os.environ["AWS_SECRET_ACCESS_KEY"]
-    #    _env_vars["DOCKER_EXEC"] = "weaveworks/eksctl:0.82.0"
-
-    #    inputargs = {"display": True,
-    #                 "human_description": "Mapping AWS IAM to EKS role",
-    #                 "env_vars": json.dumps(_env_vars)}
-
-    #    stack.map_role.run(**inputargs)
 
     return stack.get_results()
