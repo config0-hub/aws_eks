@@ -127,7 +127,7 @@ def run(stackargs):
     stack.set_variable("build_image",
                        "aws/codebuild/standard:7.0")
 
-    stack.set_variable("timeout", 2700)
+    stack.set_variable("build_timeout", 2700)
 
     # use the terraform constructor (helper)
     # but this is optional
@@ -165,7 +165,7 @@ def run(stackargs):
     if stack.get_attr("role_name"):
 
         inputargs = {
-            "build_timeout": stack.timeout,  # Changed from build_timeout to timeout
+            "build_timeout": stack.build_timeout,
             "compute_type": stack.compute_type,
             "image_type": stack.image_type,
             "build_image": stack.build_image,

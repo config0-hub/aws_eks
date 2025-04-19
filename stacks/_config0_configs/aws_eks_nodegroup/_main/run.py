@@ -55,94 +55,71 @@ def run(stackargs):
     # instantiate authoring stack
     stack = newStack(stackargs)
 
-    stack.parse.add_required(
-        key="eks_cluster",
-        tags="tfvar,db",
-        types="str"
-    )
+    stack.parse.add_required(key="eks_cluster",
+                             tags="tfvar,db",
+                             types="str")
 
     stack.parse.add_required(key="eks_node_group_subnet_ids")
 
-    stack.parse.add_required(
-        key="eks_node_capacity_type",
-        default="ON_DEMAND",
-        choices=["ON_DEMAND", "SPOT"],
-        tags="tfvar",
-        types="str"
-    )
+    stack.parse.add_required(key="eks_node_capacity_type",
+                             default="ON_DEMAND",
+                             choices=["ON_DEMAND", "SPOT"],
+                             tags="tfvar",
+                             types="str")
 
-    stack.parse.add_required(
-        key="eks_node_ami_type",
-        default="AL2_x86_64",
-        choices=["AL2_x86_64", "AL2_x86_64_GPU", "AL2_ARM_64", "CUSTOM"],
-        tags="tfvar",
-        types="str"
-    )
+    stack.parse.add_required(key="eks_node_ami_type",
+                             default="AL2_x86_64",
+                             choices=["AL2_x86_64", "AL2_x86_64_GPU",
+                                      "AL2_ARM_64", "CUSTOM"],
+                             tags="tfvar",
+                             types="str")
 
-    stack.parse.add_optional(
-        key="eks_node_role_arn",
-        default=None,
-        tags="tfvar",
-        types="str"
-    )
+    stack.parse.add_optional(key="eks_node_role_arn",
+                             default=None,
+                             tags="tfvar",
+                             types="str")
 
-    stack.parse.add_optional(
-        key="eks_node_instance_types",
-        default=["t3.medium"],
-        tags="tfvar,db",
-        types="list"
-    )
+    stack.parse.add_optional(key="eks_node_instance_types",
+                             default=["t3.medium"],
+                             tags="tfvar,db",
+                             types="list")
 
-    stack.parse.add_optional(
-        key="eks_node_max_capacity",
-        default="2",
-        tags="tfvar",
-        types="int"
-    )
+    stack.parse.add_optional(key="eks_node_max_capacity",
+                             default="2",
+                             tags="tfvar",
+                             types="int")
 
-    stack.parse.add_optional(
-        key="eks_node_min_capacity",
-        default="1",
-        tags="tfvar",
-        types="int"
-    )
+    stack.parse.add_optional(key="eks_node_min_capacity",
+                             default="1",
+                             tags="tfvar",
+                             types="int")
 
-    stack.parse.add_optional(
-        key="eks_node_desired_capacity",
-        default="1",
-        tags="tfvar",
-        types="int"
-    )
+    stack.parse.add_optional(key="eks_node_desired_capacity",
+                             default="1",
+                             tags="tfvar",
+                             types="int")
 
-    stack.parse.add_optional(
-        key="eks_node_group_name",
-        default="null",
-        tags="tfvar,db",
-        types="str"
-    )
+    stack.parse.add_optional(key="eks_node_group_name",
+                             default="null",
+                             tags="tfvar,db",
+                             types="str")
 
-    stack.parse.add_optional(
-        key="eks_node_disksize",
-        default="25",
-        tags="tfvar",
-        types="int"
-    )
+    stack.parse.add_optional(key="eks_node_disksize",
+                             default="25",
+                             tags="tfvar",
+                             types="int")
 
-    stack.parse.add_optional(
-        key="aws_default_region",
-        default="eu-west-1",
-        tags="tfvar,resource,db,tf_exec_env",
-        types="str"
-    )
+    stack.parse.add_optional(key="aws_default_region",
+                             default="eu-west-1",
+                             tags="tfvar,resource,db,tf_exec_env",
+                             types="str")
 
     # publish_resource -> output_resource_to_ui
     stack.add_substack("config0-publish:::output_resource_to_ui")
 
     # Add execgroup
-    stack.add_execgroup(
-        "config0-publish:::aws_eks::eks-nodegroup",
-        "tf_execgroup"
-    )
+    stack.add_execgroup("config0-publish:::aws_eks::eks-nodegroup",
+                        "tf_execgroup")
 
     # Add substack
     stack.add_substack("config0-publish:::tf_executor")
