@@ -16,7 +16,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class Main(newSchedStack):
 
     def __init__(self, stackargs):
-
         newSchedStack.__init__(self, stackargs)
 
         # docker image to execute terraform with
@@ -64,7 +63,6 @@ class Main(newSchedStack):
         self.stack.init_shelloutconfigs()
 
     def run_eks_cluster(self):
-
         self.parse.add_required(key="vpc_id",
                                 tags="cluster",
                                 types="str")
@@ -107,7 +105,6 @@ class Main(newSchedStack):
         return self.stack.aws_eks_cluster.insert(display=True, **inputargs)
 
     def run_eks_nodegroup(self):
-
         self.parse.add_required(key="eks_node_capacity_type",
                                 default="ON_DEMAND",
                                 choices=["ON_DEMAND", "SPOT"],
@@ -189,7 +186,6 @@ class Main(newSchedStack):
         return self.stack.aws_eks_nodegroup.insert(display=True, **inputargs)
 
     def run(self):
-
         self.stack.unset_parallel(sched_init=True)
         self.add_job("eks_cluster")
         self.add_job("eks_nodegroup")
@@ -197,7 +193,6 @@ class Main(newSchedStack):
         return self.finalize_jobs()
 
     def schedule(self):
-
         sched = self.new_schedule()
         sched.job = "eks_cluster"
         sched.archive.timeout = 3600

@@ -9,10 +9,10 @@ This stack creates and configures an Amazon EKS (Elastic Kubernetes Service) clu
 
 | Name | Description | Default |
 |------|-------------|---------|
-| vpc_id | VPC network identifier | |
-| eks_cluster_subnet_ids | Subnet IDs for EKS cluster | |
-| eks_cluster_sg_id | EKS cluster security group ID | |
-| eks_cluster | EKS cluster name | |
+| vpc_id | VPC network identifier | &nbsp; |
+| eks_cluster_subnet_ids | Subnet IDs for EKS cluster | &nbsp; |
+| eks_cluster_sg_id | EKS cluster security group ID | &nbsp; |
+| eks_cluster | EKS cluster name | &nbsp; |
 
 ### Optional Variables
 
@@ -25,26 +25,22 @@ This stack creates and configures an Amazon EKS (Elastic Kubernetes Service) clu
 | image_type | Configuration for image type | LINUX_CONTAINER |
 | timeout | Configuration for timeout | 2700 |
 
-## Features
-- Creates an EKS cluster with specified version and configuration
-- Sets up necessary security groups and networking
-- Optionally maps AWS IAM roles to EKS RBAC permissions using AWS CodeBuild
-- Retrieves and outputs important cluster information, including endpoints and ARNs
-
 ## Dependencies
 
 ### Substacks
-- [config0-publish:::tf_executor](https://api-app.config0.com/web_api/v1.0/stacks/config0-publish/tf_executor)
+- [config0-publish:::tf_executor](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/stacks/config0-publish/tf_executor/default)
 
 ### Execgroups
-- [config0-publish:::aws_eks::eks-cluster](https://api-app.config0.com/web_api/v1.0/exec/groups/config0-publish/aws_eks/eks-cluster)
+- [config0-publish:::aws_eks::eks-cluster](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/exec/groups/config0-publish/aws_eks/eks-cluster/default)
 
 ### Shelloutconfigs
-- [config0-publish:::aws::shellout-with-codebuild](https://api-app.config0.com/web_api/v1.0/assets/shelloutconfigs/config0-publish/aws/shellout-with-codebuild)
+- [config0-publish:::aws::shellout-with-codebuild](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/shelloutconfigs/config0-publish/aws/shellout-with-codebuild/default)
 
 ## License
+<pre>
 Copyright (C) 2025 Gary Leong <gary@config0.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, version 3 of the License.
+</pre>

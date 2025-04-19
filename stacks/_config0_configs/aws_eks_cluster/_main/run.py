@@ -165,7 +165,7 @@ def run(stackargs):
     if stack.get_attr("role_name"):
 
         inputargs = {
-            "build_timeout": stack.build_timeout,
+            "build_timeout": stack.timeout,  # Changed from build_timeout to timeout
             "compute_type": stack.compute_type,
             "image_type": stack.image_type,
             "build_image": stack.build_image,

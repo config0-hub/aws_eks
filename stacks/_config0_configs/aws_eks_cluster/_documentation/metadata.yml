@@ -1,4 +1,4 @@
-desc: Creates an EKS cluster in AWS and optionally maps IAM roles to EKS RBAC permissions
+desc: Creates an EKS Kubernetes cluster in AWS with optional IAM role to RBAC mapping
 release: 0.0.1
 author: Gary Leong <gary@config0.com>
 license: GNU General Public License v3.0

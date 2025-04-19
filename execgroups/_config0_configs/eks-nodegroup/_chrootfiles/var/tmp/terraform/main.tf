@@ -1,8 +1,6 @@
 resource "aws_eks_node_group" "main" {
-
-  cluster_name = var.eks_cluster
-  subnet_ids   = var.eks_node_group_subnet_ids
-
+  cluster_name    = var.eks_cluster
+  subnet_ids      = var.eks_node_group_subnet_ids
   node_group_name = var.eks_node_group_name
   node_role_arn   = var.eks_node_role_arn
 
@@ -23,8 +21,10 @@ resource "aws_eks_node_group" "main" {
       Product = "eks"
     },
   )
+
+  # Ensure node group resources are properly destroyed before creating new ones
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
-output "arn" {
-  value = aws_eks_node_group.main.arn
-}
