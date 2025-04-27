@@ -20,7 +20,7 @@ class Main(newSchedStack):
 
         # docker image to execute terraform with
         self.parse.add_optional(key="tf_runtime",
-                                default="tofu:1.6.2",
+                                default="tofu:1.9.1",
                                 tags="cluster,nodegroups",
                                 types="str")
 

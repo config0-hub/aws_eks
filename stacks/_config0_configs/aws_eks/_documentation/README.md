@@ -17,7 +17,7 @@ This stack automates the creation of an EKS (Elastic Kubernetes Service) cluster
 ### Optional Variables
 | Name | Description | Default |
 |------|-------------|---------|
-| tf_runtime | Terraform runtime version | tofu:1.6.2 |
+| tf_runtime | Terraform runtime version | tofu:1.9.1 |
 | aws_default_region | Default AWS region | us-west-1 |
 | eks_cluster_subnet_ids | Subnet IDs for EKS cluster | &nbsp; |
 | cloud_tags_hash | Resource tags for cloud provider | null |
