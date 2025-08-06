@@ -1,0 +1,22 @@
+desc: Creates an EKS Kubernetes cluster in autom mode
+release: 0.0.1
+author: Gary Leong <gary@config0.com>
+license: GNU General Public License v3.0
+categories: 
+   - aws
+   - eks
+   - k8
+   - kubernetes
+   - cloud
+   - public_cloud
+tags:
+   - eks
+   - cluster
+   - k8
+   - kubernetes
+   - config0_saas
+   - config0
+   - aws
+   - infrastructure
+   - featured
+   - featured_infrastructure
