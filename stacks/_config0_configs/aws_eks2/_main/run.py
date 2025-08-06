@@ -30,6 +30,10 @@ class Main(newSchedStack):
                                 tags="cluster,base_helm,external_dns,argocd_crds,argocd",
                                 types="str")
 
+        self.parse.add_required(key="vpc_name",
+                                tags="cluster",
+                                types="str")
+
         self.parse.add_optional(key="aws_default_region",
                                 tags="cluster,base_helm,external_dns,argocd_crds,argocd",
                                 default="us-west-1")
