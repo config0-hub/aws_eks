@@ -85,7 +85,7 @@ class Main(newSchedStack):
             "human_description": human_description
         }
 
-        return self.stack.aws_eks_cluster_auto.insert(display=True, **inputargs)
+        return self.stack.aws_eks_auto.insert(display=True, **inputargs)
 
     def run_base_helm(self):
 
