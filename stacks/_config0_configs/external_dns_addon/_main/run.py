@@ -34,7 +34,8 @@ def run(stackargs):
 
     stack.parse.add_required(key="domain_filters",
                              tags="tfvar,db",
-                             types="list")
+                             default="null",
+                             types="str")
 
     stack.parse.add_optional(key="external_dns_policy",
                              tags="tfvar,db",

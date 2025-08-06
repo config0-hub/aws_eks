@@ -124,7 +124,7 @@ module "external_dns" {
   general_external_dns_role = "external-dns-yofool"  # Your existing general role
   
   # Optional - DNS Configuration
-  domain_filters = ["example.com", "dev.example.com"]
+  domain_filters = "example.com,dev.example.com"
   external_dns_policy = "upsert-only"  # or "sync"
   
   # Optional - Deployment Configuration
@@ -152,7 +152,7 @@ module "external_dns" {
 |----------|------|---------|-------------|
 | `eks_cluster` | string | **required** | Name of the EKS cluster |
 | `general_external_dns_role` | string | `"external-dns-yofool"` | Name of existing general ExternalDNS IAM role |
-| `domain_filters` | list(string) | `[]` | List of domains that ExternalDNS will manage |
+| `domain_filters` | csv | None | csv string that ExternalDNS will manage |
 | `external_dns_policy` | string | `"upsert-only"` | ExternalDNS policy: `sync` or `upsert-only` |
 | `addon_version` | string | `"v0.18.0-eksbuild.1"` | Version of the ExternalDNS EKS add-on |
 | `namespace` | string | `"external-dns"` | Kubernetes namespace for ExternalDNS |
@@ -229,7 +229,7 @@ module "external_dns" {
   source = "./external-dns"
   
   eks_cluster = "prod-cluster"
-  domain_filters = ["mycompany.com", "api.mycompany.com"]
+  domain_filters = "mycompany.com,api.mycompany.com"
   external_dns_policy = "sync"
   
   cloud_tags = {

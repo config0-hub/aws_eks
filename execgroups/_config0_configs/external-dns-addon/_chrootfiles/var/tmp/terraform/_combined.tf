@@ -117,7 +117,7 @@ variable "eks_cluster" {
 }
 
 # IAM Role Configuration
-variable "general_external_dns_role" {
+variable "general_external_dns_role_name" {
   description = "Name of the existing general ExternalDNS IAM role with DNS permissions"
   type        = string
   default     = "external-dns-yofool"
@@ -125,9 +125,9 @@ variable "general_external_dns_role" {
 
 # ExternalDNS Configuration
 variable "domain_filters" {
-  description = "List of domains that ExternalDNS will manage"
-  type        = list(string)
-  default     = []
+  description = "Comma-separated list of domains that ExternalDNS will manage (e.g., 'example.com,test.com')"
+  type        = string
+  default     = ""
 }
 
 variable "external_dns_policy" {
@@ -213,16 +213,20 @@ data "aws_iam_openid_connect_provider" "eks" {
   url = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 }
 
-# Reference to existing general IAM role
-data "aws_iam_role" "external_dns_general" {
-  name = var.general_external_dns_role
-}
-
 # Local Values
 locals {
   txt_owner_id         = var.txt_owner_id != null ? var.txt_owner_id : "${var.eks_cluster}-external-dns"
   oidc_issuer_url      = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
   oidc_issuer_hostname = replace(local.oidc_issuer_url, "https://", "")
+  
+  # Construct general external DNS role ARN using account ID and role name
+  general_external_dns_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.general_external_dns_role_name}"
+  
+  # Process domain filters - split comma-separated string into list and trim whitespace
+  domain_filters_list = var.domain_filters != "" ? [
+    for domain in split(",", var.domain_filters) : trimspace(domain)
+    if trimspace(domain) != ""
+  ] : []
   
   # Additional tags for resources (will be merged with cloud_tags via provider default_tags)
   resource_tags = {
@@ -272,7 +276,7 @@ resource "aws_iam_role_policy" "external_dns_assume_general" {
       {
         Effect   = "Allow"
         Action   = "sts:AssumeRole"
-        Resource = data.aws_iam_role.external_dns_general.arn
+        Resource = local.general_external_dns_role_arn
         Condition = {
           StringEquals = {
             "sts:ExternalId" = "external-dns"
@@ -311,7 +315,7 @@ resource "aws_eks_addon" "external_dns" {
         },
         {
           name  = "AWS_ROLE_ARN"
-          value = data.aws_iam_role.external_dns_general.arn
+          value = local.general_external_dns_role_arn
         },
         {
           name  = "AWS_STS_EXTERNAL_ID"
@@ -326,7 +330,7 @@ resource "aws_eks_addon" "external_dns" {
       registry   = "txt"
     },
     # Only include domainFilters if the list is not empty
-    length(var.domain_filters) > 0 ? { domainFilters = var.domain_filters } : {}
+    length(local.domain_filters_list) > 0 ? { domainFilters = local.domain_filters_list } : {}
   ))
 
   depends_on = [
@@ -411,6 +415,11 @@ output "namespace" {
   value       = kubernetes_namespace.external_dns.metadata[0].name
 }
 
+output "domain_filters_list" {
+  description = "Processed list of domain filters"
+  value       = local.domain_filters_list
+}
+
 # Infrastructure outputs
 output "oidc_provider_arn" {
   description = "ARN of the existing OIDC provider"
@@ -419,10 +428,15 @@ output "oidc_provider_arn" {
 
 output "general_role_arn" {
   description = "ARN of the general ExternalDNS role being used"
-  value       = data.aws_iam_role.external_dns_general.arn
+  value       = local.general_external_dns_role_arn
 }
 
 output "general_role_name" {
   description = "Name of the general ExternalDNS role being used"
-  value       = data.aws_iam_role.external_dns_general.name
+  value       = var.general_external_dns_role_name
+}
+
+output "aws_account_id" {
+  description = "AWS account ID"
+  value       = data.aws_caller_identity.current.account_id
 }

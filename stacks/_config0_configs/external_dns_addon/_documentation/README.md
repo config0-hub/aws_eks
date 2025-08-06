@@ -30,7 +30,7 @@ You should have received a copy of the GNU General Public License along with thi
 |------|-------------|------|---------|:--------:|
 | eks_cluster | The name of the EKS cluster | string | - | yes |
 | general_external_dns_role | IAM role name for External DNS | string | - | yes |
-| domain_filters | List of domains to manage DNS records for | list | - | yes |
+| domain_filters | csv manage DNS records for | csv | - | yes |
 | external_dns_policy | DNS record update policy | string | "upsert-only" | no |
 | addon_version | External DNS addon version | string | "v0.18.0-eksbuild.1" | no |
 | internal | Internal setting (likely an interval) | string | "1m" | no |

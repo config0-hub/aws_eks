@@ -49,8 +49,9 @@ class Main(newSchedStack):
                                 types="str")
 
         self.parse.add_required(key="domain_filters",
+                                default="null",
                                 tags="external_dns",
-                                types="list")
+                                types="str")
 
         self.parse.add_optional(key="external_dns_policy",
                                 tags="external_dns",
