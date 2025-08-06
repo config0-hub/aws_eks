@@ -44,7 +44,7 @@ class Main(newSchedStack):
                                 default='null',
                                 types="str,null")
 
-        self.parse.add_required(key="general_external_dns_role",
+        self.parse.add_required(key="general_external_dns_role_name",
                                 tags="external_dns",
                                 types="str")
 
