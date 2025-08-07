@@ -52,7 +52,7 @@ def run(stackargs):
     # Verify variables after initialization
     stack.verify_variables()
 
-    stack.set_variable("timeout", 800)
+    stack.set_variable("timeout", 1800)
 
     # use the terraform constructor (helper)
     # but this is optional
