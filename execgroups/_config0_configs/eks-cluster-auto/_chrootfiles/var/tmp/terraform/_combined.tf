@@ -38,6 +38,24 @@ variable "eks_cluster" {
   default     = "eks-dev"
 }
 
+variable "node_pools" {
+  description = "List of node pools for EKS Auto Mode compute configuration"
+  type        = list(string)
+  default     = ["general-purpose", "system"]
+}
+
+variable "enable_cluster_creator_admin_permissions" {
+  description = "Enable cluster creator admin permissions"
+  type        = bool
+  default     = true
+}
+
+variable "create_kms_key" {
+  description = "Create own KMS key for EKS cluster encryption"
+  type        = bool
+  default     = false
+}
+
 ####FILE####:::data.tf
 # Data lookups for network information based on VPC name
 
@@ -148,7 +166,7 @@ resource "aws_security_group" "eks_cluster_sg" {
 # EKS Cluster using terraform-aws-modules
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.0"
+  version = "~> 21.0"
 
   cluster_name    = var.eks_cluster
   cluster_version = "1.33"
@@ -159,14 +177,18 @@ module "eks" {
   vpc_id     = data.aws_vpc.selected.id
   subnet_ids = data.aws_subnets.private.ids
 
+
   # *** AWS EKS Auto Mode is enabled here ***
-  cluster_compute_config = {
+  compute_config = {
     enabled    = true
-    node_pools = ["general-purpose", "system" ]
+    node_pools = var.node_pools
   }
 
   # Cluster access entry
-  enable_cluster_creator_admin_permissions = true
+  enable_cluster_creator_admin_permissions = var.enable_cluster_creator_admin_permissions
+ 
+  # Create Own KMS key - not great if you create and destroy clusters
+  create_kms_key = var.create_kms_key
 
   # Use existing security group
   cluster_security_group_id = aws_security_group.eks_cluster_sg.id
