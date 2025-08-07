@@ -32,6 +32,12 @@ variable "vpc_name" {
   type        = string
 }
 
+variable "eks_cluster_version" {
+  description = "Version of the EKS cluster"
+  type        = string
+  default     = "1.33"
+}
+
 variable "eks_cluster" {
   description = "Name of the EKS cluster"
   type        = string
@@ -163,16 +169,15 @@ resource "aws_security_group" "eks_cluster_sg" {
   }
 }
 
-# EKS Cluster using terraform-aws-modules
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
 
-  cluster_name    = var.eks_cluster
-  cluster_version = "1.33"
+  name               = var.eks_cluster
+  kubernetes_version = var.eks_cluster_version
 
-  cluster_endpoint_public_access  = true
-  cluster_endpoint_private_access = true
+  endpoint_public_access  = true
+  endpoint_private_access = true
 
   vpc_id     = data.aws_vpc.selected.id
   subnet_ids = data.aws_subnets.private.ids
@@ -191,7 +196,7 @@ module "eks" {
   create_kms_key = var.create_kms_key
 
   # Use existing security group
-  cluster_security_group_id = aws_security_group.eks_cluster_sg.id
+  security_group_id = aws_security_group.eks_cluster_sg.id
 
   tags = var.cloud_tags
 }
