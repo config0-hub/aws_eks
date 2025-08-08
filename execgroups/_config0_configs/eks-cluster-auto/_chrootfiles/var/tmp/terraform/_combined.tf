@@ -182,7 +182,6 @@ module "eks" {
   vpc_id     = data.aws_vpc.selected.id
   subnet_ids = data.aws_subnets.private.ids
 
-
   # *** AWS EKS Auto Mode is enabled here ***
   compute_config = {
     enabled    = true
@@ -192,8 +191,11 @@ module "eks" {
   # Cluster access entry
   enable_cluster_creator_admin_permissions = var.enable_cluster_creator_admin_permissions
  
-  # Create Own KMS key - not great if you create and destroy clusters
   create_kms_key = var.create_kms_key
+
+  # Only set encryption_config when creating custom KMS key
+  # When create_kms_key = false, let EKS use default encryption
+  encryption_config = var.create_kms_key ? {} : null
 
   # Use existing security group
   security_group_id = aws_security_group.eks_cluster_sg.id
