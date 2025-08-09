@@ -55,7 +55,7 @@ def run(stackargs):
     # Verify variables after initialization
     stack.verify_variables()
 
-    stack.set_variable("timeout", 1800)
+    stack.set_variable("timeout", 800)
 
     if stack.install_metrics_server in ["null", None, "None"]:
         stack.set_variable("install_metrics_server", None)
