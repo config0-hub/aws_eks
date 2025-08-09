@@ -62,6 +62,50 @@ variable "create_kms_key" {
   default     = false
 }
 
+# Variables for IAM user access
+variable "create_iam_users" {
+  description = "Whether to create IAM users and grant them access to the EKS cluster"
+  type        = bool
+  default     = false
+}
+
+variable "user_list" {
+  description = "List of IAM user names to grant access to the EKS cluster"
+  type        = list(string)
+  default     = []
+}
+
+variable "user_access_policies" {
+  description = "List of EKS access policies to associate with users"
+  type        = list(string)
+  default     = [
+    "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy",
+    "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  ]
+}
+
+# Variables for IAM role access
+variable "create_iam_role_access" {
+  description = "Whether to grant IAM roles access to the EKS cluster"
+  type        = bool
+  default     = true
+}
+
+variable "role_names" {
+  description = "Comma-separated list of IAM role names to grant access to the EKS cluster"
+  type        = string
+  default     = ""
+}
+
+variable "role_access_policies" {
+  description = "List of EKS access policies to associate with roles"
+  type        = list(string)
+  default     = [
+    "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy",
+    "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  ]
+}
+
 ####FILE####:::data.tf
 # Data lookups for network information based on VPC name
 
@@ -99,9 +143,74 @@ data "aws_subnets" "public" {
   }
 }
 
+# Get current AWS account ID
+data "aws_caller_identity" "current" {}
+
 # Combine both private and public subnets into lists
 locals {
   all_subnet_ids     = concat(data.aws_subnets.private.ids, data.aws_subnets.public.ids)
+  
+  # Convert CSV role names to list and construct role ARNs only if role_names is not empty
+  role_list = var.role_names != null && var.role_names != "" ? [
+    for role_name in split(",", var.role_names) :
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${trimspace(role_name)}"
+  ] : []
+}
+
+####FILE####:::provider.tf
+# AWS Provider Configuration
+# Configures the AWS provider with region and default tagging strategy
+
+# Local block to sort tags for consistent ordering
+locals {
+  # Convert user-provided tags map to sorted list
+  sorted_cloud_tags = [
+    for k in sort(keys(var.cloud_tags)) : {
+      key   = k
+      value = var.cloud_tags[k]
+    }
+  ]
+
+  # Create a sorted and consistent map of all tags
+  all_tags = merge(
+    # Convert sorted list back to map
+    { for item in local.sorted_cloud_tags : item.key => item.value },
+    {
+      # Tag indicating resources are managed by config0
+      orchestrated_by = "config0"
+    }
+  )
+}
+
+provider "aws" {
+  # Region where AWS resources will be created
+  region = var.aws_default_region
+
+  # Default tags applied to all resources with consistent ordering
+  default_tags {
+    tags = local.all_tags
+  }
+
+  # Optional: Configure tags to be ignored by the provider
+  ignore_tags {
+    # Uncomment and customize if specific tags should be ignored
+    # keys = ["TemporaryTag", "AutomationTag"]
+  }
+}
+
+# Terraform Version Configuration
+# Specifies the required Terraform and provider versions
+terraform {
+  # Minimum Terraform version required
+  required_version = ">= 1.1.0"
+
+  # Required providers with version constraints
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws" # AWS provider source
+      version = "~> 6.0"        # Allow 6.x versions
+    }
+  }
 }
 
 ####FILE####:::main.tf
@@ -269,60 +378,108 @@ resource "aws_iam_role_policy_attachment" "node_policies" {
   role       = aws_iam_role.node.name
 }
 
-####FILE####:::provider.tf
-# AWS Provider Configuration
-# Configures the AWS provider with region and default tagging strategy
+# IAM Users and EKS Access Configuration
+# Only create if create_iam_users is true and user_list is not empty
+resource "aws_iam_user" "eks_users" {
+  for_each = var.create_iam_users ? toset(var.user_list) : toset([])
+  name     = each.key
 
-# Local block to sort tags for consistent ordering
-locals {
-  # Convert user-provided tags map to sorted list
-  sorted_cloud_tags = [
-    for k in sort(keys(var.cloud_tags)) : {
-      key   = k
-      value = var.cloud_tags[k]
-    }
-  ]
-
-  # Create a sorted and consistent map of all tags
-  all_tags = merge(
-    # Convert sorted list back to map
-    { for item in local.sorted_cloud_tags : item.key => item.value },
+  tags = merge(
+    var.cloud_tags,
     {
-      # Tag indicating resources are managed by config0
-      orchestrated_by = "config0"
+      Name = each.key
+      Purpose = "EKS cluster access"
+      Cluster = var.eks_cluster
     }
   )
+
+  depends_on = [module.eks]
 }
 
-provider "aws" {
-  # Region where AWS resources will be created
-  region = var.aws_default_region
+# Create EKS access entries for IAM users
+resource "aws_eks_access_entry" "user_access" {
+  for_each      = aws_iam_user.eks_users
+  cluster_name  = module.eks.cluster_name
+  principal_arn = aws_iam_user.eks_users[each.key].arn
+  type          = "STANDARD"
 
-  # Default tags applied to all resources with consistent ordering
-  default_tags {
-    tags = local.all_tags
-  }
+  tags = merge(
+    var.cloud_tags,
+    {
+      Name = "${each.key}-access-entry"
+      User = each.key
+      Cluster = var.eks_cluster
+    }
+  )
 
-  # Optional: Configure tags to be ignored by the provider
-  ignore_tags {
-    # Uncomment and customize if specific tags should be ignored
-    # keys = ["TemporaryTag", "AutomationTag"]
-  }
+  depends_on = [module.eks]
 }
 
-# Terraform Version Configuration
-# Specifies the required Terraform and provider versions
-terraform {
-  # Minimum Terraform version required
-  required_version = ">= 1.1.0"
-
-  # Required providers with version constraints
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws" # AWS provider source
-      version = "~> 6.0"        # Allow 6.x versions
+# Associate access policies to users
+resource "aws_eks_access_policy_association" "user_policies" {
+  for_each = {
+    for pair in setproduct(keys(aws_iam_user.eks_users), var.user_access_policies) :
+    "${pair[0]}-${replace(split("/", pair[1])[length(split("/", pair[1])) - 1], "Amazon", "")}" => {
+      user_key   = pair[0]
+      policy_arn = pair[1]
     }
   }
+
+  cluster_name  = module.eks.cluster_name
+  policy_arn    = each.value.policy_arn
+  principal_arn = aws_eks_access_entry.user_access[each.value.user_key].principal_arn
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.user_access]
+}
+
+# IAM Roles and EKS Access Configuration
+# Create EKS access entries for IAM roles - only if create_iam_role_access is true AND role_list is not empty
+resource "aws_eks_access_entry" "role_access" {
+  for_each = (var.create_iam_role_access && length(local.role_list) > 0) ? {
+    for idx, role_arn in local.role_list : 
+    replace(split("/", role_arn)[length(split("/", role_arn)) - 1], "-", "_") => role_arn
+  } : {}
+  
+  cluster_name  = module.eks.cluster_name
+  principal_arn = each.value
+  type          = "STANDARD"
+
+  tags = merge(
+    var.cloud_tags,
+    {
+      Name = "${each.key}-access-entry"
+      Role = each.key
+      Cluster = var.eks_cluster
+      Purpose = "EKS cluster access for IAM role"
+    }
+  )
+
+  depends_on = [module.eks]
+}
+
+# Associate access policies to roles - only if role access entries exist
+resource "aws_eks_access_policy_association" "role_policies" {
+  for_each = {
+    for pair in setproduct(keys(aws_eks_access_entry.role_access), var.role_access_policies) :
+    "${pair[0]}-${replace(split("/", pair[1])[length(split("/", pair[1])) - 1], "Amazon", "")}" => {
+      role_key   = pair[0]
+      policy_arn = pair[1]
+    }
+  }
+
+  cluster_name  = module.eks.cluster_name
+  policy_arn    = each.value.policy_arn
+  principal_arn = aws_eks_access_entry.role_access[each.value.role_key].principal_arn
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.role_access]
 }
 
 ####FILE####:::outputs.tf
@@ -381,4 +538,84 @@ output "cluster_role_arn" {
 output "node_role_arn" {
   description = "IAM Role ARN for EKS worker nodes"
   value       = aws_iam_role.node.arn
+}
+
+# Outputs for IAM users
+output "created_iam_users" {
+  description = "Map of created IAM users and their ARNs"
+  value = var.create_iam_users ? {
+    for k, v in aws_iam_user.eks_users : k => {
+      name = v.name
+      arn  = v.arn
+    }
+  } : {}
+}
+
+output "eks_user_access_entries" {
+  description = "Map of EKS access entries for users"
+  value = var.create_iam_users ? {
+    for k, v in aws_eks_access_entry.user_access : k => {
+      cluster_name  = v.cluster_name
+      principal_arn = v.principal_arn
+      type         = v.type
+    }
+  } : {}
+}
+
+output "user_access_summary" {
+  description = "Summary of users with cluster access"
+  value = var.create_iam_users ? {
+    cluster_name = var.eks_cluster
+    users_granted_access = keys(aws_iam_user.eks_users)
+    total_users = length(var.user_list)
+    policies_applied = var.user_access_policies
+  } : null
+}
+
+# Outputs for IAM roles
+output "eks_role_access_entries" {
+  description = "Map of EKS access entries for roles"
+  value = (var.create_iam_role_access && length(local.role_list) > 0) ? {
+    for k, v in aws_eks_access_entry.role_access : k => {
+      cluster_name  = v.cluster_name
+      principal_arn = v.principal_arn
+      type         = v.type
+    }
+  } : {}
+}
+
+output "role_access_summary" {
+  description = "Summary of roles with cluster access"
+  value = (var.create_iam_role_access && length(local.role_list) > 0) ? {
+    cluster_name = var.eks_cluster
+    roles_granted_access = local.role_list
+    total_roles = length(local.role_list)
+    policies_applied = var.role_access_policies
+  } : null
+}
+
+output "all_access_summary" {
+  description = "Complete summary of all access granted to the cluster"
+  value = {
+    cluster_name = var.eks_cluster
+    cluster_endpoint = module.eks.cluster_endpoint
+    users = var.create_iam_users ? {
+      enabled = true
+      count = length(var.user_list)
+      users = var.user_list
+    } : {
+      enabled = false
+      count = 0
+      users = []
+    }
+    roles = (var.create_iam_role_access && length(local.role_list) > 0) ? {
+      enabled = true
+      count = length(local.role_list)
+      roles = local.role_list
+    } : {
+      enabled = false
+      count = 0
+      roles = []
+    }
+  }
 }

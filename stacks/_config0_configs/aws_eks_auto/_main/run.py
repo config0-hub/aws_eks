@@ -28,6 +28,11 @@ def run(stackargs):
                              tags="tfvar,db",
                              types="str")
 
+    stack.parse.add_required(key="role_names",
+                             default="config0-iac-codebuild-role,config0-iac-lambda-role",
+                             tags="tfvar,db",
+                             types="str")
+
     stack.parse.add_required(key="eks_cluster",
                              tags="tfvar,db",
                              types="str")
