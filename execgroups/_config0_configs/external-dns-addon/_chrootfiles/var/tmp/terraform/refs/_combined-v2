@@ -1,0 +1,428 @@
+####FILE####:::provider.tf
+
+# Terraform Version Configuration
+terraform {
+  required_version = ">= 1.1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.20"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+    kubectl = {
+      source  = "gavinbunney/kubectl"  # Explicitly specify source to avoid registry confusion
+      version = ">= 1.14.0"
+    }
+  }
+}
+
+# Local block to sort tags for consistent ordering
+locals {
+  # Convert user-provided tags map to sorted list
+  sorted_cloud_tags = [
+    for k in sort(keys(var.cloud_tags)) : {
+      key   = k
+      value = var.cloud_tags[k]
+    }
+  ]
+
+  # Create a sorted and consistent map of all tags
+  all_tags = merge(
+    # Convert sorted list back to map
+    { for item in local.sorted_cloud_tags : item.key => item.value },
+    {
+      # Tag indicating resources are managed by config0
+      orchestrated_by = "config0"
+    }
+  )
+}
+
+# AWS Provider Configuration
+provider "aws" {
+  region = var.aws_default_region
+
+  # Default tags applied to all resources with consistent ordering
+  default_tags {
+    tags = local.all_tags
+  }
+
+  # Optional: Configure tags to be ignored by the provider
+  ignore_tags {
+    # Uncomment and customize if specific tags should be ignored
+    # keys = ["TemporaryTag", "AutomationTag"]
+  }
+}
+
+# Kubernetes Provider Configuration
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
+
+# Kubectl Provider Configuration
+provider "kubectl" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+  load_config_file       = false
+}
+
+####FILE####:::variables.tf
+
+# AWS Configuration Variables
+variable "aws_default_region" {
+  description = "AWS region where resources will be created"
+  type        = string
+  default     = "us-west-2"
+}
+
+variable "cloud_tags" {
+  description = "Tags to apply to cloud resources (will be sorted for consistency)"
+  type        = map(string)
+  default     = {}
+}
+
+# EKS Cluster Configuration
+variable "eks_cluster" {
+  description = "Name of the EKS cluster"
+  type        = string
+  
+  validation {
+    condition     = length(var.eks_cluster) > 0
+    error_message = "Cluster name cannot be empty."
+  }
+}
+
+# IAM Role Configuration
+variable "general_external_dns_role" {
+  description = "Name of the existing general ExternalDNS IAM role with DNS permissions"
+  type        = string
+  default     = "external-dns-yofool"
+}
+
+# ExternalDNS Configuration
+variable "domain_filters" {
+  description = "List of domains that ExternalDNS will manage"
+  type        = list(string)
+  default     = []
+}
+
+variable "external_dns_policy" {
+  description = "ExternalDNS policy: sync or upsert-only"
+  type        = string
+  default     = "upsert-only"
+  
+  validation {
+    condition     = contains(["sync", "upsert-only"], var.external_dns_policy)
+    error_message = "Policy must be either 'sync' or 'upsert-only'."
+  }
+}
+
+variable "addon_version" {
+  description = "Version of the ExternalDNS EKS add-on"
+  type        = string
+  default     = "v0.18.0-eksbuild.1"
+}
+
+variable "namespace" {
+  description = "Kubernetes namespace for ExternalDNS deployment"
+  type        = string
+  default     = "external-dns"
+  
+  validation {
+    condition     = can(regex("^[a-z0-9-]+$", var.namespace))
+    error_message = "Namespace must contain only lowercase letters, numbers, and hyphens."
+  }
+}
+
+variable "txt_owner_id" {
+  description = "Unique identifier for this ExternalDNS instance"
+  type        = string
+  default     = null
+}
+
+variable "log_level" {
+  description = "Log level for ExternalDNS"
+  type        = string
+  default     = "info"
+  
+  validation {
+    condition     = contains(["panic", "fatal", "error", "warn", "info", "debug", "trace"], var.log_level)
+    error_message = "Log level must be one of: panic, fatal, error, warn, info, debug, trace."
+  }
+}
+
+variable "interval" {
+  description = "Sync interval for ExternalDNS"
+  type        = string
+  default     = "1m"
+}
+
+variable "sources" {
+  description = "Kubernetes resources to watch for DNS entries"
+  type        = list(string)
+  default     = ["service", "ingress"]
+  
+  validation {
+    condition = alltrue([
+      for source in var.sources : contains(["service", "ingress", "node", "pod", "gateway"], source)
+    ])
+    error_message = "Sources must be from: service, ingress, node, pod, gateway."
+  }
+}
+
+####FILE####:::main.tf
+
+# Data Sources
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
+data "aws_eks_cluster" "cluster" {
+  name = var.eks_cluster
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = var.eks_cluster
+}
+
+# Reference to existing OIDC provider
+data "aws_iam_openid_connect_provider" "eks" {
+  url = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+}
+
+# Reference to existing general IAM role
+data "aws_iam_role" "external_dns_general" {
+  name = var.general_external_dns_role
+}
+
+# Local Values
+locals {
+  txt_owner_id         = var.txt_owner_id != null ? var.txt_owner_id : "${var.eks_cluster}-external-dns"
+  oidc_issuer_url      = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+  oidc_issuer_hostname = replace(local.oidc_issuer_url, "https://", "")
+  
+  # Additional tags for resources (will be merged with cloud_tags via provider default_tags)
+  resource_tags = {
+    Cluster   = var.eks_cluster
+    Component = "external-dns"
+    ManagedBy = "terraform"
+  }
+}
+
+# Cluster-Specific IAM Role for ExternalDNS
+resource "aws_iam_role" "external_dns_cluster" {
+  name        = "${var.eks_cluster}-external-dns-role"
+  description = "Cluster-specific IAM role for ExternalDNS"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = data.aws_iam_openid_connect_provider.eks.arn
+        }
+        Condition = {
+          StringEquals = {
+            "${local.oidc_issuer_hostname}:sub" = "system:serviceaccount:${var.namespace}:external-dns"
+            "${local.oidc_issuer_hostname}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = merge(local.resource_tags, {
+    Name = "${var.eks_cluster}-external-dns-role"
+  })
+}
+
+# Policy for cluster role to assume the general role
+resource "aws_iam_role_policy" "external_dns_assume_general" {
+  name = "${var.eks_cluster}-external-dns-assume-policy"
+  role = aws_iam_role.external_dns_cluster.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "sts:AssumeRole"
+        Resource = data.aws_iam_role.external_dns_general.arn
+        Condition = {
+          StringEquals = {
+            "sts:ExternalId" = "external-dns"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# Kubernetes Namespace
+resource "kubernetes_namespace" "external_dns" {
+  metadata {
+    name = var.namespace
+    labels = {
+      name = var.namespace
+    }
+  }
+}
+
+# ExternalDNS EKS Add-on
+resource "aws_eks_addon" "external_dns" {
+  cluster_name                = var.eks_cluster
+  addon_name                  = "external-dns"
+  addon_version               = var.addon_version
+  service_account_role_arn    = aws_iam_role.external_dns_cluster.arn
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+  
+  configuration_values = jsonencode(merge(
+    {
+      env = [
+        {
+          name  = "AWS_DEFAULT_REGION"
+          value = data.aws_region.current.name
+        },
+        {
+          name  = "AWS_ROLE_ARN"
+          value = data.aws_iam_role.external_dns_general.arn
+        },
+        {
+          name  = "AWS_STS_EXTERNAL_ID"
+          value = "external-dns"
+        }
+      ]
+      
+      policy     = var.external_dns_policy
+      txtOwnerId = local.txt_owner_id
+      sources    = var.sources
+      interval   = var.interval
+      registry   = "txt"
+    },
+    # Only include domainFilters if the list is not empty
+    length(var.domain_filters) > 0 ? { domainFilters = var.domain_filters } : {}
+  ))
+
+  depends_on = [
+    kubernetes_namespace.external_dns,
+    aws_iam_role_policy.external_dns_assume_general
+  ]
+
+  tags = merge(local.resource_tags, {
+    Name = "${var.eks_cluster}-external-dns-addon"
+  })
+}
+
+# Scale ExternalDNS deployment using kubectl patch with anti-affinity
+resource "kubectl_manifest" "external_dns_scale" {
+  yaml_body = <<YAML
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns
+  namespace: ${var.namespace}
+spec:
+  replicas: 2
+  template:
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - external-dns
+              topologyKey: kubernetes.io/hostname
+YAML
+
+  server_side_apply = true
+  force_conflicts   = true
+
+  depends_on = [aws_eks_addon.external_dns]
+}
+
+# Force redeployment to apply anti-affinity rules
+resource "null_resource" "restart_external_dns" {
+  triggers = {
+    kubectl_manifest_id = kubectl_manifest.external_dns_scale.id
+  }
+
+  provisioner "local-exec" {
+    command = <<EOT
+      # Delete one pod to trigger rescheduling with anti-affinity
+      FIRST_POD=$(kubectl get pods -n ${var.namespace} -l app.kubernetes.io/name=external-dns -o jsonpath='{.items[0].metadata.name}')
+      kubectl delete pod $FIRST_POD -n ${var.namespace}
+      
+      # Wait for the deployment to stabilize
+      kubectl rollout status deployment external-dns -n ${var.namespace}
+    EOT
+  }
+
+  depends_on = [kubectl_manifest.external_dns_scale]
+}
+
+####FILE####:::outputs.tf
+
+# Cluster-specific outputs
+output "cluster_external_dns_role_arn" {
+  description = "ARN of the cluster-specific ExternalDNS IAM role"
+  value       = aws_iam_role.external_dns_cluster.arn
+}
+
+output "cluster_external_dns_role_name" {
+  description = "Name of the cluster-specific ExternalDNS IAM role"
+  value       = aws_iam_role.external_dns_cluster.name
+}
+
+# EKS Add-on outputs
+output "external_dns_addon_arn" {
+  description = "ARN of the ExternalDNS add-on"
+  value       = aws_eks_addon.external_dns.arn
+}
+
+output "external_dns_addon_version" {
+  description = "Version of the ExternalDNS add-on"
+  value       = aws_eks_addon.external_dns.addon_version
+}
+
+# Configuration outputs
+output "txt_owner_id" {
+  description = "TXT owner ID used by ExternalDNS"
+  value       = local.txt_owner_id
+}
+
+output "namespace" {
+  description = "Kubernetes namespace where ExternalDNS is deployed"
+  value       = kubernetes_namespace.external_dns.metadata[0].name
+}
+
+# Infrastructure outputs
+output "oidc_provider_arn" {
+  description = "ARN of the existing OIDC provider"
+  value       = data.aws_iam_openid_connect_provider.eks.arn
+}
+
+output "general_role_arn" {
+  description = "ARN of the general ExternalDNS role being used"
+  value       = data.aws_iam_role.external_dns_general.arn
+}
+
+output "general_role_name" {
+  description = "Name of the general ExternalDNS role being used"
+  value       = data.aws_iam_role.external_dns_general.name
+}

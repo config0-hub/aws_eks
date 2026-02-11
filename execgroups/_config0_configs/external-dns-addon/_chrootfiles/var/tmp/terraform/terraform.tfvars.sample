@@ -1,0 +1,11 @@
+eks_cluster = "eks-dev"
+aws_default_region = "us-east-1"
+general_external_dns_role = "eks-external-dns"
+
+# Tags to apply to all resources
+cloud_tags = {
+  Environment = "dev"
+  Department  = "config0"
+  CostCenter  = "CC-config0"
+  ManagedBy   = "Terraform"
+}

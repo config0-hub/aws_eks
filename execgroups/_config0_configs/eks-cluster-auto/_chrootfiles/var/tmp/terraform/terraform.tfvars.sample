@@ -1,0 +1,16 @@
+# Network configuration
+vpc_name           = "config0-iac"
+
+# EKS cluster configuration
+eks_cluster       = "eks-dev"
+
+# AWS provider configuration
+aws_default_region = "us-east-1"
+
+# Tags to apply to all resources
+cloud_tags = {
+  Environment = "dev"
+  Department  = "config0"
+  CostCenter  = "CC-config0"
+  ManagedBy   = "Terraform"
+}

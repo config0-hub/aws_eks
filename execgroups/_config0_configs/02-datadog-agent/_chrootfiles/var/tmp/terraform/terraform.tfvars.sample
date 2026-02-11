@@ -1,0 +1,2 @@
+eks_cluster = "eks-dev"
+aws_default_region = "us-east-1"
