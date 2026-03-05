@@ -38,14 +38,14 @@ This stack automates the creation of an EKS (Elastic Kubernetes Service) cluster
 ## Dependencies
 
 ### Substacks
-- [config0-publish:::aws_eks_cluster](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/stacks/config0-publish/aws_eks_cluster/default)
-- [config0-publish:::aws_eks_nodegroup](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/stacks/config0-publish/aws_eks_nodegroup/default)
+- [config0-hub:::aws_eks::aws_eks_cluster](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/stacks/config0-hub/aws_eks_cluster/default)
+- [config0-hub:::aws_eks::aws_eks_nodegroup](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/stacks/config0-hub/aws_eks_nodegroup/default)
 
 ### Execgroups
-- [config0-publish:::aws_eks::eks-cluster](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/exec/groups/config0-publish/aws_eks/eks-cluster/default)
+- [config0-hub:::aws_eks::eks-cluster](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/exec/groups/config0-hub/aws_eks/eks-cluster/default)
 
-### Shelloutconfigs
-- [config0-publish:::aws::map-role-aws-to-eks](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/shelloutconfigs/config0-publish/aws/map-role-aws-to-eks/default)
+### Scripts
+- [config0-hub:::aws::map-role-aws-to-eks](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/scripts/config0-hub/aws/map-role-aws-to-eks/default)
 
 ## License
 <pre>

@@ -5,10 +5,10 @@ This stack creates an AWS EKS cluster using Terraform.
 ## Dependencies
 
 ### Substacks
-- [config0-publish:::tf_executor](https://api-app.config0.com/web_api/v1.0/stacks/config0-publish/tf_executor)
+- [config0-hub:::config0_core::tf_executor](https://api-app.config0.com/web_api/v1.0/stacks/config0-hub/tf_executor)
 
 ### Execgroups
-- [config0-publish:::aws_eks::eks-cluster-auto](https://api-app.config0.com/web_api/v1.0/exec/groups/config0-publish/aws_eks/eks-cluster-auto)
+- [config0-hub:::aws_eks::eks-cluster-auto](https://api-app.config0.com/web_api/v1.0/exec/groups/config0-hub/aws_eks/eks-cluster-auto)
 
 ## Infrastructure
 

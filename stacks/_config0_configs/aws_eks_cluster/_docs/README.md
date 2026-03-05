@@ -28,13 +28,13 @@ This stack creates and configures an Amazon EKS (Elastic Kubernetes Service) clu
 ## Dependencies
 
 ### Substacks
-- [config0-publish:::tf_executor](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/stacks/config0-publish/tf_executor/default)
+- [config0-hub:::config0_core::tf_executor](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/stacks/config0-hub/tf_executor/default)
 
 ### Execgroups
-- [config0-publish:::aws_eks::eks-cluster](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/exec/groups/config0-publish/aws_eks/eks-cluster/default)
+- [config0-hub:::aws_eks::eks-cluster](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/exec/groups/config0-hub/aws_eks/eks-cluster/default)
 
-### Shelloutconfigs
-- [config0-publish:::aws::shellout-with-codebuild](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/shelloutconfigs/config0-publish/aws/shellout-with-codebuild/default)
+### Scripts
+- [config0-hub:::aws::shellout-with-codebuild](http://config0.http.redirects.s3-website-us-east-1.amazonaws.com/assets/scripts/config0-hub/aws/shellout-with-codebuild/default)
 
 ## License
 <pre>

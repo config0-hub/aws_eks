@@ -91,21 +91,21 @@ def run(stackargs):
                              default="LINUX_CONTAINER")
 
     # Add execgroup
-    stack.add_execgroup("config0-publish:::aws_eks::eks-cluster",
+    stack.add_execgroup("config0-hub:::aws_eks::eks-cluster",
                         "tf_execgroup")
 
     # Add substack
-    stack.add_substack("config0-publish:::tf_executor")
+    stack.add_substack("config0-hub:::config0_core::tf_executor")
 
-    # Add shelloutconfig dependencies
-    stack.add_shelloutconfig("config0-publish:::aws::shellout-with-codebuild",
-                             "shellout_codebuild")
+    # Add script dependencies
+    stack.add_script("config0-hub:::aws::shellout-with-codebuild",
+                     "shellout_codebuild")
 
     # Initialize
     stack.init_variables()
     stack.init_execgroups()
     stack.init_substacks()
-    stack.init_shelloutconfigs()
+    stack.init_scripts()
 
     stack.set_variable("eks_cluster_subnet_ids",
                        stack.to_list(stack.eks_cluster_subnet_ids),

@@ -48,11 +48,11 @@ def run(stackargs):
                              tags="tfvar,db,resource",
                              types="str")
 
-    stack.add_execgroup("config0-publish:::aws_eks::install-argocd",
+    stack.add_execgroup("config0-hub:::aws_eks::install-argocd",
                         "tf_execgroup")
 
     # Add substack
-    stack.add_substack("config0-publish:::tf_executor")
+    stack.add_substack("config0-hub:::config0_core::tf_executor")
 
     # Initialize
     stack.init_variables()

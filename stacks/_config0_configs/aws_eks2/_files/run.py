@@ -63,11 +63,11 @@ class Main(newSchedStack):
                                 choices=["upsert-only","sync"])
 
         # add substacks
-        self.stack.add_substack("config0-publish:::aws_eks_auto")
-        self.stack.add_substack("config0-publish:::base_helm_pkgs")
-        self.stack.add_substack("config0-publish:::external_dns_addon")
-        self.stack.add_substack("config0-publish:::install_argo_crds")
-        self.stack.add_substack("config0-publish:::install_argocd")
+        self.stack.add_substack("config0-hub:::aws_eks::aws_eks_auto")
+        self.stack.add_substack("config0-hub:::aws_eks::base_helm_pkgs")
+        self.stack.add_substack("config0-hub:::aws_eks::external_dns_addon")
+        self.stack.add_substack("config0-hub:::aws_eks::install_argo_crds")
+        self.stack.add_substack("config0-hub:::aws_eks::install_argocd")
 
         # initialize
         self.stack.init_substacks()

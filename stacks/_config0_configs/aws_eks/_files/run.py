@@ -46,21 +46,21 @@ class Main(newSchedStack):
                                 types="str,null")
 
         # add execgroup
-        self.stack.add_execgroup("config0-publish:::aws_eks::eks-cluster",
+        self.stack.add_execgroup("config0-hub:::aws_eks::eks-cluster",
                                  "cloud_resource")
 
-        # add shelloutconfig dependencies
-        self.stack.add_shelloutconfig("config0-publish:::aws::map-role-aws-to-eks",
-                                      "map_role")
+        # add script dependencies
+        self.stack.add_script("config0-hub:::aws::map-role-aws-to-eks",
+                              "map_role")
 
         # add substacks
-        self.stack.add_substack("config0-publish:::aws_eks_cluster")
-        self.stack.add_substack("config0-publish:::aws_eks_nodegroup")
+        self.stack.add_substack("config0-hub:::aws_eks::aws_eks_cluster")
+        self.stack.add_substack("config0-hub:::aws_eks::aws_eks_nodegroup")
 
         # initialize
         self.stack.init_execgroups()
         self.stack.init_substacks()
-        self.stack.init_shelloutconfigs()
+        self.stack.init_scripts()
 
     def run_eks_cluster(self):
         self.parse.add_required(key="vpc_id",
