@@ -68,8 +68,9 @@ def run(stackargs):
                              types="str")
 
     stack.parse.add_required(key="eks_node_ami_type",
-                             default="AL2_x86_64",
-                             choices=["AL2_x86_64", "AL2_x86_64_GPU",
+                             default="AL2023_x86_64_STANDARD",
+                             choices=["AL2023_x86_64_STANDARD", "AL2023_ARM_64_STANDARD",
+                                      "AL2_x86_64", "AL2_x86_64_GPU",
                                       "AL2_ARM_64", "CUSTOM"],
                              tags="tfvar",
                              types="str")
