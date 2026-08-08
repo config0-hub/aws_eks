@@ -16,6 +16,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '''
 
 import json
+
 from config0_publisher.terraform import TFConstructor
 
 
@@ -177,12 +178,12 @@ def run(stackargs):
             "EKS_ROLENAME": stack.role_name
         }
 
-        env_vars = {"CODEBUILD_PARAMS_HASH": stack.b64_encode({
+        env_vars = {"CODEBUILD_PARAMS_HASH": stack.serialize({
             "buildparams": {
                 "inputargs": inputargs,
                 "env_vars": build_env_vars
             }
-        })}
+        }, json=False)}
 
         inputargs = {"display": True,
                      "human_description": "Mapping AWS IAM to EKS role with Codebuild",

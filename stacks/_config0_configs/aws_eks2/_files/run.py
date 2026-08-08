@@ -175,8 +175,6 @@ class Main(newSchedStack):
         sched.job = "eks_cluster"
         sched.archive.timeout = 3600
         sched.archive.timewait = 120
-        sched.conditions.retries = 1
-        sched.automation_phase = "infrastructure"
         sched.human_description = "Create EKS cluster"
         sched.on_success = ["base_helm"]
         self.add_schedule()
@@ -185,7 +183,6 @@ class Main(newSchedStack):
         sched.job = "base_helm"
         sched.archive.timeout = 1800
         sched.archive.timewait = 120
-        sched.automation_phase = "infrastructure"
         sched.human_description = "Install Base Helm Packages"
         sched.on_success = ["external_dns"]
         self.add_schedule()
@@ -194,7 +191,6 @@ class Main(newSchedStack):
         sched.job = "external_dns"
         sched.archive.timeout = 1800
         sched.archive.timewait = 120
-        sched.automation_phase = "infrastructure"
         sched.human_description = "Install External DNS"
         sched.on_success = ["argocd_crds"]
         self.add_schedule()
@@ -203,7 +199,6 @@ class Main(newSchedStack):
         sched.job = "argocd_crds"
         sched.archive.timeout = 1800
         sched.archive.timewait = 120
-        sched.automation_phase = "infrastructure"
         sched.human_description = "Install ArgoCD CRDS"
         sched.on_success = ["argocd"]
         self.add_schedule()
@@ -212,7 +207,6 @@ class Main(newSchedStack):
         sched.job = "argocd"
         sched.archive.timeout = 1800
         sched.archive.timewait = 120
-        sched.automation_phase = "infrastructure"
         sched.human_description = "Install ArgoCD"
         self.add_schedule()
 
