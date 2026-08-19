@@ -16,6 +16,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '''
 
 import json
+
 from config0_publisher.terraform import TFConstructor
 
 
