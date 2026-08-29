@@ -154,7 +154,7 @@ def run(stackargs):
         types="str"
     )
 
-    stack.set_variable("timeout", 2700)
+    stack.set_variable("timeout", 2400)
 
     _set_eks_node_group_name(stack)
     _set_eks_node_role_arn(stack)

@@ -32,7 +32,7 @@ This stack automates the creation of an EKS (Elastic Kubernetes Service) cluster
 | eks_node_desired_capacity | Desired EKS node count | 1 |
 | eks_node_disksize | Disk size for EKS nodes (GB) | 25 |
 | eks_node_group_name | EKS node group identifier | null |
-| timeout | Timeout for node group operations | 1800 |
+| timeout | Timeout for node group operations | 2400 |
 | eks_node_group_subnet_ids | Subnet IDs for EKS node group | null |
 
 ## Dependencies

@@ -161,7 +161,6 @@ class Main(newSchedStack):
         return self.stack.install_argocd.insert(display=True, **inputargs)
 
     def run(self):
-        self.stack.unset_parallel(sched_init=True)
         self.add_job("eks_cluster")
         self.add_job("base_helm")
         self.add_job("external_dns")

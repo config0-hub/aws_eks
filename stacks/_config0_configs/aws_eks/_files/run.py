@@ -159,7 +159,7 @@ class Main(newSchedStack):
 
         self.parse.add_optional(key="timeout",
                                 tags="nodegroups",
-                                default=1800)
+                                default=2400)
 
         self.parse.add_optional(key="eks_node_group_subnet_ids",
                                 tags="nodegroups",
@@ -188,7 +188,6 @@ class Main(newSchedStack):
         return self.stack.aws_eks_nodegroup.insert(display=True, **inputargs)
 
     def run(self):
-        self.stack.unset_parallel(sched_init=True)
         self.add_job("eks_cluster")
         self.add_job("eks_nodegroup")
 

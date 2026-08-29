@@ -26,7 +26,7 @@ This stack creates and manages an Amazon EKS node group attached to an existing 
 | eks_node_group_name | EKS node group identifier | null |
 | eks_node_disksize | Disk size for EKS nodes (GB) | 25 |
 | aws_default_region | Default AWS region | eu-west-1 |
-| timeout | Configuration for timeout | 2700 |
+| timeout | Configuration for timeout | 2400 |
 
 ## Dependencies
 
