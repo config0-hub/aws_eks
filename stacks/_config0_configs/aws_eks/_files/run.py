@@ -20,7 +20,7 @@ class Main(newSchedStack):
 
         # docker image to execute terraform with
         self.parse.add_optional(key="tf_runtime",
-                                default="tofu:1.9.1",
+                                default="tofu:1.10.6",
                                 tags="cluster,nodegroups",
                                 types="str")
 
@@ -198,8 +198,6 @@ class Main(newSchedStack):
         sched.job = "eks_cluster"
         sched.archive.timeout = 3600
         sched.archive.timewait = 120
-        sched.conditions.retries = 1
-        sched.automation_phase = "infrastructure"
         sched.human_description = "Create EKS cluster"
         sched.on_success = ["eks_nodegroup"]
         self.add_schedule()
@@ -208,7 +206,6 @@ class Main(newSchedStack):
         sched.job = "eks_nodegroup"
         sched.archive.timeout = 3600
         sched.archive.timewait = 120
-        sched.automation_phase = "infrastructure"
         sched.human_description = "Create EKS nodegroup"
         self.add_schedule()
 
