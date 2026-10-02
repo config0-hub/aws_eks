@@ -78,7 +78,7 @@ class Main(newSchedStack):
                                 types="str,null")
 
         self.parse.add_optional(key="eks_cluster_version",
-                                default="1.25",
+                                default="1.37",
                                 tags="cluster",
                                 types="float")
 

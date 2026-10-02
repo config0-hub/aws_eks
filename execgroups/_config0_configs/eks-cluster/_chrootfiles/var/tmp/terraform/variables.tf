@@ -8,7 +8,7 @@ variable "aws_default_region" {
 variable "eks_cluster_version" {
   description = "Kubernetes version to use for the EKS cluster"
   type        = string
-  default     = "1.24"
+  default     = "1.37"
 }
 
 variable "vpc_id" {
