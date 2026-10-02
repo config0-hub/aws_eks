@@ -12,6 +12,15 @@ resource "aws_eks_cluster" "main" {
     public_access_cidrs     = var.public_access_cidrs
   }
 
+  # API_AND_CONFIG_MAP lets an access grant add an EKS access entry (CON-11
+  # contract, section 2b). The bootstrap flag is set to true, which is what the
+  # provider reads back for a cluster made without it; it is ForceNew, so
+  # leaving it unset would replace an existing cluster.
+  access_config {
+    authentication_mode                         = "API_AND_CONFIG_MAP"
+    bootstrap_cluster_creator_admin_permissions = true
+  }
+
   tags = merge(
     var.cloud_tags,
     {
