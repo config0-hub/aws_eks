@@ -80,10 +80,10 @@ class Main(newSchedStack):
         self.parse.add_optional(key="eks_cluster_version",
                                 default="1.37",
                                 tags="cluster",
-                                types="float")
+                                types="str")
 
         self.parse.add_optional(key="publish_to_saas",
-                                default="null",
+                                default=False,
                                 tags="cluster",
                                 types="bool")
 

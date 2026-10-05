@@ -71,7 +71,7 @@ def run(stackargs):
     stack.parse.add_optional(key="eks_cluster_version",
                              default="1.37",
                              tags="tfvar,db",
-                             types="float")
+                             types="str")
 
     # mapping eks service account to aws role
     stack.parse.add_optional(key="role_name",
