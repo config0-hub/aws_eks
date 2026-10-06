@@ -15,6 +15,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import os
+
 from config0_publisher.terraform import TFConstructor
 
 
@@ -26,7 +28,10 @@ def _set_eks_node_role_arn(stack):
     resource_info = stack.get_resource(
         name=stack.eks_cluster,
         resource_type="eks",
-        must_exists=True
+        provider="aws",
+        match={"aws_account_id": os.environ["TARGET_AWS_ACCOUNT"]},
+        must_exists=True,
+        must_be_one=True
     )[0]
 
     stack.set_variable(
